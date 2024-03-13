@@ -1,0 +1,49 @@
+.dropmenu {
+    position: absolute;
+    will-change: transform;
+    top: 0px;
+    left: 0px;
+    transform: translate3d(0px, 34px, 0px);
+}
+
+.add-animation {
+    transition-duration: 1s;
+    animation: addNew 2s 1 linear;
+    transform-origin: top;
+}
+@keyframes addNew {
+
+    0% {
+        background-color: #ffa;
+    }
+    10% {
+        background-color: #fff;
+    }
+    20% {
+        background-color: #ffa;
+    }
+    30% {
+        background-color: #fff;
+    }
+    40% {
+        background-color: #ffa;
+    }
+    50% {
+          background-color: #fff;
+    }
+    60% {
+        background-color: #ffa;
+    }
+    70% {
+        background-color: #fff;
+    }
+    80% {
+        background-color: #ffa;
+    }
+    90% {
+        background-color: #fff;
+    }
+    100% {
+        background-color: #ffa;
+    }
+}
