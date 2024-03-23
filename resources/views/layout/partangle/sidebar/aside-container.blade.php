@@ -43,7 +43,7 @@
 
                 @foreach($shareMenu as $key_menu1 => $item_menu1)
 
-                    @if(in_array($item_menu1['id_menu'],  $shareMenuUser) or Auth::user()->role=='adminXXXXXX')
+                    @if(in_array($item_menu1['id_menu'],  $shareMenuUser) or Auth::user()->role=='admin')
 
                    <li class=" "><a href="#{{$item_menu1['nameurl']}}" title="{{$item_menu1['name']}}" data-toggle="collapse"><em class="icon-grid"></em><span >{{$item_menu1['name']}} </span></a>
                         <ul class="sidebar-nav sidebar-subnav collapse" id="{{$item_menu1['nameurl']}}">
@@ -52,33 +52,9 @@
 
                             @if(count($item_menu1['program'])>0)
                                 @foreach($item_menu1['program'] as $key_prog1 => $item_prog1)
-                                    {{--
-                                    @if(in_array($item_prog1['id_program'],  $shareProgramUser) or Auth::user()->role=='adminXXXXXX')
-                                        @php
-                                            $arrParamRout = [];
-                                            if($item_prog1['id_enter']!=null){
-                                                $arrParamRout[] = $item_prog1['id_enter'];
-                                            }
-                                            if($item_prog1['id_proj']!=null){
-                                                $arrParamRout[] = $item_prog1['id_proj'];
-                                            }
-                                            if($item_prog1['id_city']!=null){
-                                                $arrParamRout[] = $item_prog1['id_city'];
-                                            }
-                                        @endphp
-
-                                        <li class="@if(Route::currentRouteName()==$item_prog1['routename'])active @endif ">
 
 
-                                            <a href="{{route($item_prog1['routename'],$arrParamRout)}}" title="{{$item_prog1['description']}}">
-                                                <span>{{$item_prog1['description']}}</span>
-                                            </a>
-                                        </li>
-                                    @endif
-                                    --}}
-
-
-                                        @if(in_array($item_prog1['id_program'],  $shareProgramUser) or Auth::user()->role=='adminXXXXXX')
+                                        @if(in_array($item_prog1['id_program'],  $shareProgramUser) or Auth::user()->role=='admin')
                                             <li
                                                 class="
                                                                 @if(Route::currentRouteName()==$item_prog1['routename'] and
@@ -106,7 +82,7 @@
                             @if(count($item_menu1['submenu'])>0)
                                 @foreach($item_menu1['submenu'] as $key_menu2 => $item_menu2)
 
-                                    @if(in_array($item_menu2['id_menu'],  $shareMenuUser) or Auth::user()->role=='adminXXXXXX')
+                                    @if(in_array($item_menu2['id_menu'],  $shareMenuUser) or Auth::user()->role=='admin')
                                         <li class=" "><a href="#{{$item_menu2['nameurl']}}" title="{{$item_menu2['name']}}" data-toggle="collapse"><em class="fas fa-angle-left"></em><span >{{$item_menu2['name']}}</span></a>
                                             <ul class="sidebar-nav sidebar-subnav collapse" id="{{$item_menu2['nameurl']}}">
                                                 <li class="sidebar-subnav-header">{{$item_menu2['name']}}</li>
@@ -114,7 +90,7 @@
 
                                                 @if(count($item_menu2['program'])>0)
                                                     @foreach($item_menu2['program'] as $key_prog2 => $item_prog2)
-                                                        @if(in_array($item_prog2['id_program'],  $shareProgramUser) or Auth::user()->role=='adminXXXXXX')
+                                                        @if(in_array($item_prog2['id_program'],  $shareProgramUser) or Auth::user()->role=='admin')
                                                             <li
                                                                 class="
                                                                 @if(Route::currentRouteName()==$item_prog2['routename'] and

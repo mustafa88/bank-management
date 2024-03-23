@@ -5,6 +5,7 @@
         let myTable,myRowTable=null;
 
 
+
         $(document).ready(function(){
             myTable = $('#datatable1').DataTable({
                 'paging': true, // Table pagination

@@ -4,7 +4,7 @@
 
         let myTable,myRowTable=null;
 
-        let _param_url  ={!! json_encode($param_url) !!}
+        let _param_url  ={!! json_encode($param_url) !!};
 
         $(document).ready(function(){
             myTable = $('#datatable1').DataTable({
@@ -295,6 +295,15 @@
             let url='{{route('usb_report.show' ,['p1'])}}';
             url = urlParam(url);
             url += "?fromDate=" + fdate + "&toDate=" + tdate;
+
+            //alert(url);
+            window.location.href = url;
+        });
+
+        $(document).on('click', '#sadkatfter', function (e) {
+            let url='{{route('usb_expense_entrep.show' ,['p1','p3'])}}';
+            url = urlParam(url);
+            url += "?fter=1";
 
             //alert(url);
             window.location.href = url;

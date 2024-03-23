@@ -197,6 +197,8 @@
                         <div class="col-auto">
                             <button class="mb-2 btn btn-success" type="button" id="showbydate">عرض الجدول</button>
                             <button class="mb-2 btn btn-success" type="button" id="showbydatereport">عرض تلخيص</button>
+
+                            <button class="mb-2 btn btn-success" type="button" id="sadkatfter">صدقة فطر</button>
                         </div>
                     </div>
 

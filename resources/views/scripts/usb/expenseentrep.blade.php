@@ -21,7 +21,34 @@
             });
 
             InitPage();
+
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            if( urlParams.get('fter') != null && urlParams.get('fter')=='1'){
+                ramdanFter();
+                $("#divselectprog").hide();
+                $("#id_expense").hide();
+                $('label[for="note"]').text('عدد العائلات');
+                $('label[for="id_expense"]').text('صاحب خط التوزيع');
+
+
+            }else{
+                $("#divselectprog").show();
+                $("#id_expense").show();
+                $('label[for="note"]').text('ملاحظة');
+                $('label[for="id_expense"]').text('مورد');
+            }
         });
+
+
+        $('#dateexpense').on( 'change', function () {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            if( urlParams.get('fter') != null && urlParams.get('fter')=='1') {
+                $("#dateinvoice").val($(this).val());
+            }
+        });
+
 
         $('#id_proj').on( 'change', function () {
             $('#id_expense').find('option').remove()
@@ -246,6 +273,15 @@
         }).change();
 
 
+        /**
+        $(document).on('click', '#fter', function (e){
+            if ($('#fter').is(':checked')) {
+                ramdanFter();
+            }else{
+                InitPage();
+            }
+        });
+         **/
         function urlParam(url ,id_line){
             url = url.replace('p1', _param_url['id_entrep'] ).replace('p2', _param_url['id_proj'] ).replace('p3', _param_url['id_city'] )
             if(id_line!= undefined ){
@@ -258,11 +294,11 @@
 
             myRowTable=null;
             $("#id_line").val('0');
-            $("#id_proj").val('1').change();
+            $("#id_proj").change();
             $("#asmctaexpense").val('');
             //$("#").val('');
 
-            $("#id_expense").val('0').change();
+            //$("#id_expense").val('0').change();
             $("#id_expenseother").val('');
             $("#amount").val('');
             $("#id_titletwo").val('');
@@ -281,8 +317,9 @@
             const formattedToday =  yyyy + '-' + mm + '-' + dd;
             $("#dateexpense").val('');
 
-            //$(".ramdan").hide();
-            //$("#id_expenseother").hide();
+
+
+
         }
 
         /**
@@ -302,9 +339,9 @@
             //alert(formattedToday);
             $("#id_expense").val('999999').change();
             $("#numinvoice").val('0') ;
-            $("#dateinvoice").val(formattedToday);
+            //$("#dateinvoice").val(formattedToday);
             $("#id_titletwo").val('3') ;
-            $("#dateexpense").val(formattedToday) ;
+            //$("#dateexpense").val(formattedToday) ;
             $("#asmctaexpense").val('0') ;
 
             $(".ramdan").hide();

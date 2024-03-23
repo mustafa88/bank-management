@@ -29,7 +29,7 @@
                 @csrf
                 <div class="form-row align-items-center">
 
-                    <div class="col-auto">
+                    <div class="col-auto" id="divselectprog">
                         <label for="id_proj">المشروع</label>
                         <select name="id_proj" id="id_proj" class="custom-select custom-select-sm">
                             @foreach($projects as $item)
@@ -39,7 +39,7 @@
                     </div>
 
                     <div class="col-auto">
-                        <label for="id_expense">مورد</label>
+                        <label for="id_expense" id="labelid_expense">مورد</label>
                         <select name="id_expense" id="id_expense" class="custom-select custom-select-sm">
                             {{--
                             <option value="0">اختر</option>
@@ -74,14 +74,14 @@
 
 
                     <div class="col-auto">
-                        <label for="note">ملاحظة</label>
+                        <label for="note" >ملاحظة</label>
                         <input class="form-control mb-6" name='note' id="note" type="text">
                     </div>
 
                 </div>
 
-                <div class="form-row align-items-center ramdan">
-                    <div class="col-auto">
+                <div class="form-row align-items-center ">
+                    <div class="col-auto ramdan">
                         <div class=" d-flex align-items-center bg-green justify-content-center ">
                             <div class="text-center">
 
@@ -91,7 +91,7 @@
                         </div>
                     </div>
 
-                    <div class="col-auto ">
+                    <div class="col-auto ramdan">
                         <label for="id_titletwo">طريقة الدفع</label>
                         <select name="id_titletwo" id="id_titletwo" class="custom-select custom-select-sm">
                             <option value="">اختر</option>
@@ -102,12 +102,12 @@
                     </div>
 
 
-                    <div class="col-auto ">
+                    <div class="col-auto ramdanxxx">
                         <label for="dateexpense">تاريخ الدفع</label>
                         <input class="form-control mb-2" name="dateexpense" id="dateexpense" type="date">
                     </div>
 
-                    <div class="col-auto ">
+                    <div class="col-auto ramdan">
                         <label for="asmctaexpense">رقم الاسمختا - מס צק, מס העברה וכו</label>
                         <input class="form-control mb-2" name='asmctaexpense' id="asmctaexpense" type="number">
                     </div>
