@@ -95,12 +95,22 @@ class UsbIncomeController extends Controller
         }
 
         if (!$request->session()->has('showLineFromDate')) {
-            $request->session()->put('showLineFromDate', date('Y-01-01'));
+            $request->session()->put('showLineFromDate', date('Y-m-d'));
         }
 
         if (!$request->session()->has('showLineToDate')) {
-            $request->session()->put('showLineToDate', date('Y-12-31'));
+            $request->session()->put('showLineToDate', date('Y-m-d'));
         }
+
+        $chekZka = substr($request->user()->username,-3) =='zka' ? 1:0 ;
+
+        $lastDayDate = (new \DateTime())->modify('-1 day')->format('Y-m-d');
+
+        if($chekZka &&  $request->session()->get('showLineFromDate') <$lastDayDate){
+            //משתממש ZKA לא יכול לחזור בתאריכים יותר מיום אחד
+            $request->session()->put('showLineFromDate', date('Y-m-d'));
+        }
+
 
         $showLineFromDate = $request->session()->get('showLineFromDate');
         $showLineToDate = $request->session()->get('showLineToDate');
@@ -169,6 +179,16 @@ class UsbIncomeController extends Controller
         if (!$request->session()->has('showLineToDate')) {
             $request->session()->put('showLineToDate', date('Y-12-31'));
         }
+
+        $chekZka = substr($request->user()->username,-3) =='zka' ? 1:0 ;
+
+        $lastDayDate = (new \DateTime())->modify('-1 day')->format('Y-m-d');
+
+        if($chekZka &&  $request->session()->get('showLineFromDate') <$lastDayDate){
+            //משתממש ZKA לא יכול לחזור בתאריכים יותר מיום אחד
+            $request->session()->put('showLineFromDate', date('Y-m-d'));
+        }
+
 
         $showLineFromDate = $request->session()->get('showLineFromDate');
         $showLineToDate = $request->session()->get('showLineToDate');

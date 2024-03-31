@@ -87,6 +87,8 @@ class UsbExpenseController extends Controller
             $request->session()->put('showLineToDate',date('Y-12-31'));
         }
 
+
+
         $showLineFromDate = $request->session()->get('showLineFromDate');
         $showLineToDate = $request->session()->get('showLineToDate');
 
