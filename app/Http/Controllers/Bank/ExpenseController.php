@@ -8,10 +8,25 @@ use App\Models\Bank\Enterprise;
 use App\Models\Bank\Income;
 use App\Models\Bank\Projects;
 use App\Models\Bank\Expense;
+use App\Models\Usb\Usbexpense;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
+
+    public function showTable()
+    {
+        $expense = Expense::get()->toArray();
+        //xxxxxxxxxxxxxxx
+        return view('managetable.expense', compact('expense'))
+            ->with(
+                [
+                    'pageTitle' => "جدول باسماء الموارد",
+                    'subTitle' => 'جدول الموارد التي يتم التعامل معها',
+                ]
+            );
+    }
+    /**
     public function show()
     {
         $enterprise = Enterprise::with(['project.expense' => function ($query) {
@@ -25,7 +40,7 @@ class ExpenseController extends Controller
                 ]
             );
     }
-
+    **/
     function showExpenseAndIncome(){
         //הצגת כל הכנסות והוצאות
         $expense= Expense::get()->toArray();
@@ -67,6 +82,21 @@ class ExpenseController extends Controller
         ];
         Expense::create($arrDate);
         return redirect()->back()->with("success", "تم الحفظ بنجاح");
+    }
+
+    public function delete(ExpenseRequset $request,$id_expense){
+
+        $countBank = Banksdetail::where('id_expens',$id_expense)->count();
+        $countUsb = Usbexpense::where('id_expense',$id_expense)->count();
+        if($countBank==0 or $countUsb==0){
+            //ניתן למחוק
+            Expense::where('id', '=', $id_expense)->delete();
+            return redirect()->back()->with("success", "تم الحذف بنجاح");
+        }else{
+            //בוצע שימוש בסוג הכנסה לא ניתן למחוק
+            return redirect()->back()->with("success", "لا يمكن الحذف - لقد تم استخدام المورد من قبل");
+        }
+
     }
 
     public function storeOLD(ExpenseRequset $requset, $id){

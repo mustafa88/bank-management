@@ -29,6 +29,11 @@ class MidPermissionProgram
 
         $idUser = Auth::user()->id;
 
+        $userName = Auth::user()->username;
+
+        if($userName=='admin'){
+            return $next($request);
+        }
 
         //שם תונכה/ תוכניות למשתמש שיש לו הרשאה להם עם אותו שם ROUTE
         //מצב שיש יותר מתוכנה אחד - אם היא מקבלת משתנים שונים בכל כניסה - כמו בנקים

@@ -42,7 +42,17 @@ class AppServiceProvider extends ServiceProvider
 
             $shareMenu =  Pmenu::with('submenu','program')->whereNull('id_menu_sub')->orderBy('sort', 'asc')->get();
             **/
-            $shareMenu =  Pmenu::with('submenu','program','submenu.program')->whereNull('id_menu_sub')->orderBy('sort', 'asc')->get();
+            $shareMenu =  Pmenu::with([
+                'submenu' => function($query) {
+                    $query->orderBy('sort', 'asc');
+                }
+                ,'program' => function($query) {
+                    $query->orderBy('sort', 'asc');
+                }
+                ,'submenu.program' => function($query) {
+                    $query->orderBy('sort', 'asc');
+                }
+            ])->whereNull('id_menu_sub')->orderBy('sort', 'asc')->get();
             //$idUser =   auth()->user();
             //$idUser =  Auth::id();
             view()->composer('*', function($view){

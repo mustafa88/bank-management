@@ -13,18 +13,61 @@
 
 
     <div class="card">
-        {{--
+
         <div class="card-header">
-            <h3 class="card-title">Button sizing</h3>
+            <h3 class="card-title">موارد</h3>
         </div>
         <div class="card-body">
-            --}}
-        @if (Session::has('success'))
-            <div class="row">
-                <div class="alert alert-success" role="alert"><strong>{{ Session::get('success') }}</strong></div>
-            </div>
-        @endif
 
+
+            @if (Session::has('success'))
+                <div class="row">
+                    <p class="alert1 alert-success" role="alert"><strong>{{ Session::get('success') }}</strong></p>
+                </div>
+            @endif
+            <div class="row">
+
+
+                @if($errors->any())
+                    {!! implode('', $errors->all('<div>:message</div>')) !!}
+                @endif
+
+                <ol>
+                    @foreach ($expense as $item )
+                        <form method="post" action="{{route('table.income.delete',$item['id'])}}">
+                            <li>
+                                {{ $item['name']}}
+                                {{--
+                                @csrf
+                                @method('delete')
+                                <span style="padding-right: 10px;"><button class="mb-1 btn-xs btn btn-outline-danger" type="submit">حذف</button></span>
+                                --}}
+                            </li>
+                        </form>
+                    @endforeach
+                    <li>
+                        <form method="post" action="{{route('table.expense.store')}}">
+                            @csrf
+                            <div class="form-row align-items-center">
+
+                                <div class="col-auto">
+                                    <input type="text" name="name" placeholder="اسم المورد"
+                                           class="form-control mb-2">
+                                </div>
+                                <div class="col-auto">
+                                    <input type="submit" name="save" value="حفظ"
+                                           class="btn btn-success mb-2">
+                                </div>
+
+                            </div>
+                        </form>
+                    </li>
+
+                    </li>
+
+                </ol>
+            </div>
+        {{--
         @if($errors->any())
             {!! implode('', $errors->all('<div>:message</div>')) !!}
         @endif
@@ -56,6 +99,7 @@
 
             </ol>
         </div>
+        --}}
     </div>
     </div>
 

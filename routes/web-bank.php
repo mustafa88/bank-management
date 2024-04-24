@@ -160,6 +160,34 @@ Route::group(['prefix' => 'managetable/connect_projects_city', 'namespace' => 'B
 });
 **/
 
+Route::group(['prefix' => 'managetable/income', 'namespace' => 'Bank', 'middleware' => ['auth','permprog:table.income.show']], function () {
+    //انواع المدخولات
+    Route::get('show', [IncomeController::class ,'showTable'])->name('table.income.show');
+    Route::post('store', [IncomeController::class ,'store'])->name('table.income.store');
+
+    Route::delete('delete/{id_income}', [IncomeController::class ,'delete'])->name('table.income.delete');
+    //מחזיר כל סוגי תרומה לפרויקט מסויים
+    Route::get('income_by_project/{id_proj?}', [IncomeController::class ,'getByProjects'])->name('table.incomebyproject.store');
+});
+
+Route::group(['prefix' => 'managetable/expense', 'namespace' => 'Bank', 'middleware' => ['auth','permprog:table.expense.show']], function () {
+    //انواع المصروفات - موارد
+    //xxxxxxxxxxxxxxx
+    Route::get('show', [ExpenseController::class ,'showTable'])->name('table.expense.show');
+    Route::post('store', [ExpenseController::class ,'store'])->name('table.expense.store');
+
+    Route::delete('delete/{id_income}', [ExpenseController::class ,'delete'])->name('table.expense.delete');
+
+    //מחזיר כל שמות ספקים לפרויקט מסויים
+    Route::get('expense_by_project/{id_proj?}', [ExpenseController::class ,'getByProjects'])->name('table.expensebyproject.store');
+
+
+});
+
+/**
+ * תוכנה פוצלה לשתי מסכים
+ * מסך אלד לסוגי הכנסה ועוד מסך לסוגי הוצאה שזה ספקים
+ * ***/
 Route::group(['prefix' => 'managetable/expense_income', 'namespace' => 'Bank', 'middleware' => ['auth','permprog:table.expense_income.show']], function () {
     //جدول المصروفات والمدخولات
     //managetable/enterprise/show
