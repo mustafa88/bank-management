@@ -36,33 +36,87 @@ class ExportImportController extends Controller
     public function mainExport(Request $request)
     {
 
-        switch ($request->typefile) {
-            case "donate":
-                $fileDb = Donateworth::get()->toArray();
-                $startName = "donate-";
-                break;
-            case "donatetype":
-                $fileDb = Donatetype::get()->toArray();
-                $startName = "donatetype-";
-                break;
-            case "income":
-                //$fileDb = Usbincome::withTrashed()->all()->toArray();
-                $fileDb = Usbincome::withTrashed()->get()->toArray();
-                //RETURN $fileDb;
-                $startName = "income-";
-                break;
-            case "expense":
-                //$fileDb = Usbexpense::withTrashed()->all()->toArray();
-                $fileDb = Usbexpense::withTrashed()->get()->toArray();
-                $startName = "expense-";
-                break;
-            case "adahi":
-                $fileDb = Adahi::withTrashed()->get()->toArray();
-                $startName = "adahi-";
-                break;
-            default:
-                return redirect()->back()->withErrors(['msg' => "خطا بنوع الملف"]);
+        if($request->typefile==0){
+            return redirect()->back()->with("success", "لم يتم اختيار نوع ملف11" . $request->typefile);
         }
+
+        $flgDate=false;
+        if(!empty($request->monthtype)){
+            $flgDate=true;
+            $yaer = substr($request->monthtype,0,4);
+            $month = substr($request->monthtype,5);
+        }
+
+
+        /**
+        if($request->showexport){
+            switch ($request->typefile) {
+                case "donate":
+                    $fileDb = Donateworth::get()->toArray();
+                    $startName = "donate-";
+                    break;
+                case "donatetype":
+                    $fileDb = Donatetype::get()->toArray();
+                    $startName = "donatetype-";
+                    break;
+                case "income":
+                    $fileDb = Usbincome::select('enterprise.name', \DB::raw('SUM(amount) as total_amount'))
+                        ->with(['enterprise', 'projects', 'city', 'income', 'currency', 'titletwo'])
+                        //->selectRaw('aa')
+                        ->whereYear('dateincome',$yaer)->whereMonth('dateincome',$month)
+                        ->groupBy('enterprise.name')
+                        //->sum('amount');
+                        ->get();
+                    //, 'projects.name','city.name','income.name','currency.symbol','title_two.ttwo_text'
+                    return $fileDb;
+                    return redirect()->back()->with("success", $fileDb);
+                    break;
+                case "expense":
+                    //$fileDb = Usbexpense::withTrashed()->all()->toArray();
+                    $fileDb = Usbexpense::withTrashed()->get()->toArray();
+                    $startName = "expense-";
+                    break;
+                case "adahi":
+                    $fileDb = Adahi::withTrashed()->get()->toArray();
+                    $startName = "adahi-";
+                    break;
+                default:
+                    return redirect()->back()->withErrors(['msg' => "خطا بنوع الملف"]);
+            }
+        }
+         **/
+
+
+        if($request->btn_savecsv){
+
+            switch ($request->typefile) {
+                case "donate":
+                    $fileDb = Donateworth::get()->toArray();
+                    $startName = "donate-";
+                    break;
+                case "donatetype":
+                    $fileDb = Donatetype::get()->toArray();
+                    $startName = "donatetype-";
+                    break;
+                case "income":
+                    $fileDb = Usbincome::withTrashed()->get()->toArray();
+                    return $fileDb;
+                    $startName = "income-";
+                    break;
+                case "expense":
+                    //$fileDb = Usbexpense::withTrashed()->all()->toArray();
+                    $fileDb = Usbexpense::withTrashed()->get()->toArray();
+                    $startName = "expense-";
+                    break;
+                case "adahi":
+                    $fileDb = Adahi::withTrashed()->get()->toArray();
+                    $startName = "adahi-";
+                    break;
+                default:
+                    return redirect()->back()->withErrors(['msg' => "خطا بنوع الملف"]);
+            }
+        }
+
 
         $str = "";
         foreach ($fileDb as $item1) {

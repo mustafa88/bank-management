@@ -36,11 +36,17 @@
                                 <option value="adahi">اضاحي</option>
                                 <option value="donate">تبرعات عينيه</option>
                                 <option value="donatetype">انواع التبرعات العيتية</option>
-
-
-
                             </select>
-                            <button class="btn btn-primary mb-2" type="submit" name="btn_savecsv" >تنزيل ملف</button>
+
+                        </div>
+                        <!--
+                        <div class="col-auto">
+                            <label>شهر <input type="month" name="monthtype" id="monthtype"></label>
+                        </div>
+                        -->
+                        <div class="col-auto">
+                            <!-- <input type="submit" class="btn btn-primary mb-2" name="showexport" value="عرض"> -->
+                            <input type="submit" class="btn btn-primary mb-2" name="btn_savecsv" value="تنزيل ملف">
                         </div>
                     </div>
                 </div>

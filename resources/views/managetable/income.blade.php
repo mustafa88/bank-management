@@ -21,7 +21,7 @@
 
             @if (Session::has('success'))
                 <div class="row">
-                    <p class="alert1 alert-success" role="alert"><strong>{{ Session::get('success') }}</strong></p>
+                    <p class="alert alert-success" role="alert"><strong>{{ Session::get('success') }}</strong></p>
                 </div>
             @endif
         <div class="row">
