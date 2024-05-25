@@ -132,9 +132,9 @@ class AdahiController extends Controller
                 'note' => $request->note,
             ];
 
-            $arrDate['sheepprice']= 2000 * $arrDate['sheep'];
-            $arrDate['cowsevenprice']= 1400 * $arrDate['cowseven'];
-            $arrDate['cowprice']= 9800 * $arrDate['cow'];
+            $arrDate['sheepprice']= LAMB_PRICE * $arrDate['sheep'];
+            $arrDate['cowsevenprice']= COWSEVEN_PRICE * $arrDate['cowseven'];
+            $arrDate['cowprice']= COW_PRICE * $arrDate['cow'];
 
             if(($arrDate['waitthll']=='1' or $arrDate['partahadi']=='1') and  $arrDate['phone']==null){
                 $resultArr['status'] = false;
@@ -289,9 +289,9 @@ class AdahiController extends Controller
                 $rowAdahi->note= $request->note;
 
 
-                $rowAdahi->sheepprice= 2000 * $rowAdahi->sheep;
-                $rowAdahi->cowsevenprice= 1400 * $rowAdahi->cowseven;
-                $rowAdahi->cowprice= 9800 * $rowAdahi->cow;
+                $rowAdahi->sheepprice= LAMB_PRICE * $rowAdahi->sheep;
+                $rowAdahi->cowsevenprice= COWSEVEN_PRICE * $rowAdahi->cowseven;
+                $rowAdahi->cowprice= COW_PRICE * $rowAdahi->cow;
 
 
                 if(($rowAdahi->waitthll=='1' or $rowAdahi->partahadi=='1') and  $rowAdahi->phone==null){

@@ -1,8 +1,8 @@
 
     <script type="text/javascript">
-        const _SHEEP = 2000;
-        const _COW = 9800;
-        const _COWSEVEN = 1400;
+        const _SHEEP = {{LAMB_PRICE}};
+        const _COW = {{COW_PRICE}};
+        const _COWSEVEN = {{COWSEVEN_PRICE}};
         let myTable,myRowTable=null;
 
         let _param_url  ={!! json_encode($param_url) !!}

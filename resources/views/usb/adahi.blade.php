@@ -52,15 +52,15 @@
                     </div>
 
                     <div class="col-auto">
-                        <label for="sheep">خروف - 2,000<span style="color: #ff0000;font-weight: bold;">*</span></label>
+                        <label for="sheep">خروف - {{number_format(LAMB_PRICE)}}<span style="color: #ff0000;font-weight: bold;">*</span></label>
                         <input class="form-control mb-2" name='sheep' id="sheep" type="number" >
                     </div>
                     <div class="col-auto">
-                        <label for="cowseven">سبع عجل  - 1,400<span style="color: #ff0000;font-weight: bold;">*</span></label>
+                        <label for="cowseven">سبع عجل  - {{number_format(COWSEVEN_PRICE)}}<span style="color: #ff0000;font-weight: bold;">*</span></label>
                         <input class="form-control mb-2" name='cowseven' id="cowseven" type="number"  max="6">
                     </div>
                     <div class="col-auto">
-                        <label for="cow">عجل - 9,800<span style="color: #ff0000;font-weight: bold;">*</span></label>
+                        <label for="cow">عجل - {{number_format(COW_PRICE)}}<span style="color: #ff0000;font-weight: bold;">*</span></label>
                         <input class="form-control mb-2" name='cow' id="cow" type="number" >
                     </div>
 
