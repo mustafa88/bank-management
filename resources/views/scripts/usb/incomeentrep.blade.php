@@ -129,7 +129,7 @@
 
                 //return url;
                 let resultAjax = SendToAjax(url,'POST');
-                console.log(resultAjax);
+                //console.log(resultAjax);
                 if(resultAjax==undefined){
                     notify('حدث خطأ','error');
                     return false;
@@ -300,6 +300,47 @@
             window.location.href = url;
         });
 
+
+        $(document).on('click', '#exportdataline', function (e) {
+
+
+            if (!confirm("ارسال بيانات بمبلغ يساوي " + $("#sumlineexport").text() )) {
+                return false;
+            }
+            let url= '{{route('usb_income.exportData',['p1','p2','p3'])}}';
+            url = urlParam(url);
+            //console.log(url);
+            alert(url);
+            //return;
+
+
+            $('#formselct').attr('action', url).submit();
+
+            /*form=document.getElementById('idOfForm');
+            //form.target='_blank';
+            form.action=url;
+            form.submit();*/
+
+        });
+
+        $('.selectbox').on( 'change', function () {
+            //alert(this.checked);
+            let x = $("#sumlineexport").text();
+            if(x==''){
+                x = 0;
+            }else{
+                x = Number(x);
+            }
+
+            if(this.checked){
+                x = x + Number($(this).data('amount'));
+            }else{
+                x = x - Number($(this).data('amount'));
+            }
+
+            //alert(x);
+            $("#sumlineexport").text(x);
+        });
         $(document).on('click', '#sadkatfter', function (e) {
             let url='{{route('usb_expense_entrep.show' ,['p1','p3'])}}';
             url = urlParam(url);
@@ -317,7 +358,15 @@
             return url;
         }
 
+        function selectAll(){
+            $("input[name='selectbox[]']").prop("checked", true);
 
+            //$('.selectbox') להמשיך ולקבל כל מה שסומן ולחשב את הסכום שלו + להמשיך ולאפס את מורידים כל מה שסומן - לבדוק אם יש דפים בטבלה
+        }
+
+        function unSelectAll(){
+            $("input[name='selectbox[]']").prop("checked", false);
+        }
 
 
         function InitPage(customRest){

@@ -33,21 +33,36 @@
             لا
         @endif</td>
     <td>{{$rowData['nameovid']}}</td>
-    <td>{{$rowData['note']}}</td>
+    <td>{{$rowData['note']}}
+        @if($rowData['export_at']!=null and $rowData['note']!=null)
+            <br>
+        @endif
+        @if($rowData['export_at']!=null)
+            تصدير: {{Str::substr($rowData['export_at'],0,10)}}
+        @endif
+    </td>
 
-    {{--<td style="direction: ltr;">{{Str::substr($rowData['updated_at'],0,-3)}}</td>--}}
     <td>
-        <div class="btn-group mb-1">
-            <button class="btn dropdown-toggle btn-primary" type="button" data-toggle="dropdown"
-                    aria-expanded="false">בחר
-            </button>
-            <div class="dropdown-menu dropmenu" role="menu" x-placement="bottom-start">
-                <a class="dropdown-item edit_row" href="javascript:void(0)" data-idline="{{$rowData['uuid_usb']}}"><i
-                        class="far fa-edit"></i> تعديل</a>
-                <a class="dropdown-item delete_row" href="javascript:void(0)" data-idline="{{$rowData['uuid_usb']}}"><i
-                        class="far fa-trash-alt"></i> حذف</a>
-            </div>
+
+
+    <div class="btn-group mb-1">
+        <button class="btn dropdown-toggle btn-primary" type="button" data-toggle="dropdown"
+                aria-expanded="false">בחר
+        </button>
+        <div class="dropdown-menu dropmenu" role="menu" x-placement="bottom-start">
+            <a class="dropdown-item edit_row" href="javascript:void(0)" data-idline="{{$rowData['uuid_usb']}}"><i
+                    class="far fa-edit"></i> تعديل</a>
+            <a class="dropdown-item delete_row" href="javascript:void(0)" data-idline="{{$rowData['uuid_usb']}}"><i
+                    class="far fa-trash-alt"></i> حذف</a>
         </div>
+    </div>
+
+    <label class="c-checkbox">
+        <input type="checkbox" name="selectbox[]" class="selectbox" value="{{$rowData['uuid_usb']}}" data-amount="{{$rowData['amount']}}" >
+        <span class="fa fa-check"></span>
+        اختيار</label>
+
+
     </td>
 </tr>
 

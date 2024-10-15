@@ -299,8 +299,12 @@ Route::group(['prefix' => 'usb_income/{id_entrep?}/{id_proj?}/{id_city?}', 'name
     //report - סיכום
     //Route::get('showreport/{FromDate?}/{ToDate?}', [UsbIncomeController::class ,'showReport'])->name('usb_income.show.report');
 
-    //תיעוד הכנסות - USB
+    //הצגת קבלה לפי מספר שלה
     Route::get('showKabala', [UsbIncomeController::class ,'showKabala'])->name('usb_income.showKabala');
+
+    Route::post('exportData', [UsbIncomeController::class ,'exportData'])->name('usb_income.exportData');
+
+
 
 
 });

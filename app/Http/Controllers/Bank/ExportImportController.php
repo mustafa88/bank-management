@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Bank;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bank\Currency;
 use App\Models\Bank\Donatetype;
 use App\Models\Bank\Donateworth;
 use App\Models\Usb\Adahi;
@@ -19,7 +20,8 @@ class ExportImportController extends Controller
     public function mainDonateExportImport()
     {
 
-        return view('manageabnk.exportimport')
+        $currency = Currency::get();
+        return view('manageabnk.exportimport' , compact('currency'))
             ->with(
                 [
                     'pageTitle' => "יבוא יצוא קובצים",
@@ -37,18 +39,17 @@ class ExportImportController extends Controller
     {
 
         if($request->typefile==0){
-            return redirect()->back()->with("success", "لم يتم اختيار نوع ملف11" . $request->typefile);
+            return redirect()->back()->with("success", "لم يتم اختيار نوع ملف" . $request->typefile);
         }
 
+        /**
         $flgDate=false;
         if(!empty($request->monthtype)){
             $flgDate=true;
             $yaer = substr($request->monthtype,0,4);
             $month = substr($request->monthtype,5);
         }
-
-
-        /**
+         *
         if($request->showexport){
             switch ($request->typefile) {
                 case "donate":
@@ -100,7 +101,7 @@ class ExportImportController extends Controller
                     break;
                 case "income":
                     $fileDb = Usbincome::withTrashed()->get()->toArray();
-                    return $fileDb;
+                    //return $fileDb;
                     $startName = "income-";
                     break;
                 case "expense":
@@ -118,9 +119,9 @@ class ExportImportController extends Controller
         }
 
 
-        $str = "";
+        $str = "{$request->typefile}@*@" . PHP_EOL;
         foreach ($fileDb as $item1) {
-            $str .= implode(',', $item1) . PHP_EOL;
+            $str .= implode('@*@', $item1) . PHP_EOL;
         }
 
         //$fileName = $startName . Str::uuid()->toString().".dat";
@@ -154,38 +155,52 @@ class ExportImportController extends Controller
         }
         $typeFile = substr($filename, 0, $pos);
 
-        $dataDat = array();
         switch ($typeFile) {
             case "donate":
                 //תרומה בשווה
                 $lenArr = 13;
-                $nameFun = 'import_donate';
             case "donatetype":
                 //סוגי תרומה
                 $lenArr = 3;
-                $nameFun = 'import_donatetype';
                 break;
-            case "income":
+            case "incomeline":// הכנסות דיווח שוורת מסויימות
                 //הכנסות
-                $lenArr = 19;
-                $nameFun = 'import_income';
+                $lenArr = 20;
+                break;
+            case "income"://הכנסות - הל ההכנסות
+                //הכנסות
+                $lenArr = 20;
                 break;
             case "expense":
                 //הוצאות
                 $lenArr = 16;
-                $nameFun = 'import_expense';
                 break;
             case "adahi":
                 //הוצאות
                 $lenArr = 25;
-                $nameFun = 'import_adahi';
                 break;
             default:
                 return redirect()->back()->withErrors(['msg' => "خطا بنوع الملف"]);
         }
 
+
+
         $handle = fopen($tempPath, "r");
-        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        $numLine=1;
+        $dataDat = array();
+        while (($data = fgets($handle)) !== false) {
+            //while (($data = fgetcsv($handle, 1000, "@*@")) !== FALSE) {
+            $data =explode("@*@", trim($data));
+
+            if($numLine==1){
+                //שורה ראשונה בקובץ שווה לשם סוג הקובץ
+                if (count($data) != 2 or $data[0]!=$typeFile) {
+                    ddd($numLine,$data,$typeFile,'error count line');
+                }
+                $numLine++;
+                continue;
+            }
+
             if (count($data) != $lenArr) {
                 ddd('error count line');
             }
@@ -193,7 +208,47 @@ class ExportImportController extends Controller
         }
         fclose($handle);
 
-        return $this->$nameFun($dataDat);
+
+        $checkSum=false;
+
+        switch ($typeFile) {
+            case "donate":
+                //תרומה בשווה
+                return $this->import_donate($dataDat);
+            case "donatetype":
+                //סוגי תרומה
+                return $this->import_donatetype($dataDat);
+                break;
+
+            case "incomeline":// הכנסות דיווח שוורת מסויימות
+                //הכנסות
+                $currency = Currency::get();
+                $listCurrencyPost  =array();
+                foreach ($currency as $item){
+                    $tmp="count".$item['curn_id'];
+                    $listCurrencyPost[$item['curn_id']] = $request->$tmp;
+                }
+                return $this->import_income_line($dataDat,$listCurrencyPost);
+
+                break;
+            case "income"://הכנסות - הל ההכנסות
+                //הכנסות
+                return $this->import_income_forzaka($dataDat);
+                break;
+            case "expense":
+                //הוצאות
+                return $this->import_expense($dataDat);
+                break;
+            case "adahi":
+                //הוצאות
+                return $this->import_adahi($dataDat);
+                break;
+            default:
+                return redirect()->back()->withErrors(['msg' => "خطا بنوع الملف"]);
+        }
+
+
+
 
     }
 
@@ -326,13 +381,24 @@ class ExportImportController extends Controller
     }
 
 
-
-    public function import_income($dataDat)
+    /**
+     * @param $dataDat
+     * @param $ArrCheckSum
+     * @return \Illuminate\Http\RedirectResponse
+     * שיהיה מיוחדת للئكاه
+     */
+    public function import_income_forzaka($dataDat )
     {
+
         //הכנסות
         try {
             \DB::beginTransaction();
 
+            $currency = Currency::get();
+            $listCurrency  =array();
+            foreach ($currency as $item){
+                $listCurrency[$item['curn_id']]=0;
+            }
             $updateCount = 0;
             $insertCount = 0;
             foreach ($dataDat as $item) {
@@ -342,6 +408,7 @@ class ExportImportController extends Controller
 
                 $usbincome_check = Usbincome::withTrashed()->find($uuid_income);
 
+                $listCurrency[$item[7]] =+ $item[6];
 
                 if ($usbincome_check) {
                     $updated_at_db = $usbincome_check['updated_at']->format('Y-m-d H:i:s');
@@ -365,9 +432,10 @@ class ExportImportController extends Controller
                         $usbincome_check->son = $item[13]==''?null:$item[13];
                         $usbincome_check->nameovid = $item[14]==''?null:$item[14];
                         $usbincome_check->note = $item[15]==''?null:$item[15];
-                        $usbincome_check->deleted_at = $item[16]==''?null:$item[16];
-                        $usbincome_check->created_at = $item[17];
-                        $usbincome_check->updated_at = $item[18];
+                        $usbincome_check->export_at = $item[16]==''?null:$item[16];
+                        $usbincome_check->deleted_at = $item[17]==''?null:$item[17];
+                        $usbincome_check->created_at = $item[18];
+                        $usbincome_check->updated_at = $item[19];
                         $usbincome_check->save();
                         $updateCount++;
                     }
@@ -392,15 +460,151 @@ class ExportImportController extends Controller
                     'son' => $item[13]==''?null:$item[13],
                     'nameovid' => $item[14]==''?null:$item[14],
                     'note' => $item[15]==''?null:$item[15],
-                    'deleted_at' => $item[16]==''?null:$item[16],
-                    'created_at' => $item[17],
-                    'updated_at' => $item[18],
+                    'export_at' => $item[16]==''?null:$item[16],
+                    'deleted_at' => $item[17]==''?null:$item[17],
+                    'created_at' => $item[18],
+                    'updated_at' => $item[19],
                 ]);
                 $insertCount++;
             }
 
+
+
             \DB::commit(); // Tell Laravel this transacion's all good and it can persist to DB
             return redirect()->back()->with("success", "تم الحفظ بنجاح - تم النعديل على {$updateCount} وتم حفظ {$insertCount} اسطر جديدة");
+
+        } catch (\Exception $exp) {
+
+            \DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+            return redirect()->back()->withErrors(['msg' => "حدث خطا اثناء الحفظ - لم يتم حفظ اي معلومه من الملف <BR> " . $exp->getMessage()]);
+        }
+    }
+
+
+    public function import_income_line($dataDat ,$ArrCheckSum)
+    {
+
+
+        //הכנסות
+        try {
+            \DB::beginTransaction();
+
+            $currency = Currency::get();
+            $listCurrency  =array();
+            $detailsCurrency = array();
+            foreach ($currency as $item){
+                $listCurrency[$item['curn_id']]=0;
+                $detailsCurrency[$item['curn_id']]=$item['symbol'];
+            }
+
+            $countLineExists=0;
+            $dataLineExists=array();
+            //$sumLineExists= array();
+
+            $countLineNew  = 0;
+            $dataLineNew=array();
+
+            $dataLineErr = array();
+
+            //ddd($dataDat);
+            foreach ($dataDat as $item) {
+
+                $uuid_income = $item[0];
+                $updated_at_file = substr($item[18], 0, 10) . " " . substr($item[18], 11, 8);
+
+                $usbincome_check = Usbincome::withTrashed()->find($uuid_income);
+                if ($usbincome_check) {
+
+                    //اذا بالملف مبلغ لا بساوي المبلغ بالبرنامج لنفس رقم الوصلو
+                    if($item[6]!=$usbincome_check['amount'] || $item[7]!=$usbincome_check['id_curn']){
+                        \DB::rollBack();
+                        $msg = "يتواجد بالملف تبرع برقم وصل {$item[10]} متواجد بالبرنامج ولكن بمبلغ اخر - يرجى الفحص والتدقيق<br>";
+                        $msg .= "مبلغ الوصل بالملف هو {$item[6]}{$detailsCurrency[$item[7]]}<br>";
+                        $msg .= "مبلغ الوصل بالبرنامج  {$usbincome_check['amount']}{$detailsCurrency[$usbincome_check['id_curn']]}<br>";
+                        return redirect()->back()->withErrors(['msg' => $msg]);
+                    }
+
+                    //בקובץ שמייבים יש שורה קיימת  במסד ניתונים - לא צריך לעדכן אותה - כי קיבלנו אותו לפי
+                    $countLineExists++;
+                    $dataLineExists[] = "رقم الوصل {$item[10]} - مبلغ {$item[6]}{$detailsCurrency[$item[7]]}";
+
+                    if(!isset($sumLineExists[$item[7]])){
+                        $sumLineExists[$item[7]] =0;
+                    }
+                    //$sumLineExists[$item[7]] = isset($sumLineExists[$item[7]])? $sumLineExists[$item[7]] + $item[6] :  $item[6];
+
+
+
+                    continue;
+                }
+
+                $listCurrency[$item[7]] =+ $item[6];
+
+                //INSERT
+                Usbincome::create([
+                    'uuid_usb' => $uuid_income,
+                    'dateincome' => $item[1],
+                    'id_enter' => $item[2],
+                    'id_proj' => $item[3],
+                    'id_city' => $item[4],
+                    'id_incom' => $item[5],
+                    'amount' => $item[6],
+                    'id_curn' => $item[7],
+                    'id_titletwo' => $item[8],
+                    'nameclient' => $item[9],
+                    'kabala' => $item[10],
+                    'kabladat' => $item[11],
+                    'phone' => $item[12]==''?null:$item[12],
+                    'son' => $item[13]==''?null:$item[13],
+                    'nameovid' => $item[14]==''?null:$item[14],
+                    'note' => $item[15]==''?null:$item[15],
+                    'export_at' => $item[16]==''?null:$item[16],
+                    'deleted_at' => $item[17]==''?null:$item[17],
+                    'created_at' => $item[18],
+                    'updated_at' => $item[19],
+                ]);
+                $countLineNew++;
+                $dataLineNew[] = "رقم الوصل {$item[10]} - مبلغ {$item[6]}{$detailsCurrency[$item[7]]}";
+            }
+
+            if($countLineNew==0){
+                \DB::rollBack();
+                array_unshift($dataLineExists,"لم يتم الحفظ - والسبب ان الملف لا يحتوي على تبرعات جديدة");
+                array_unshift($dataLineExists,"الملف يحتوي على");
+                array_unshift($dataLineExists,"{$countLineExists} تبرعات موجوده بالفعل");
+                array_unshift($dataLineExists,"لم يتم الحفظ - والسبب ان الملف لا يحتوي على تبرعات جديدة");
+                return redirect()->back()->withErrors(['msg' => implode("<br>",$dataLineExists)]);
+            }
+
+
+            //ddd($listCurrency,$ArrCheckSum,array_keys($listCurrency));
+            $flgCheckSum = true;
+            //{$ArrCheckSum[$keyc]} - مجموع المبلغ الملف حسب العملة
+            //{$itemc} - مجموع المبلغ بالملف حسب العملة
+            foreach (array_keys($listCurrency) as $key){
+                if($listCurrency[$key] != $ArrCheckSum[$key]){
+                    $flgCheckSum = false;
+                    $dataLineErr[] = "بملف التبرعات هنالك $listCurrency[$key]{$detailsCurrency[$key]} -  بينما تم استقبال $ArrCheckSum[$key]{$detailsCurrency[$key]}";
+                }
+            }
+
+            if(!$flgCheckSum){
+                \DB::rollBack();
+                array_unshift($dataLineErr,"لم يتم الحفظ - والسبب");
+                return redirect()->back()->withErrors(['msg' => implode("<br>",$dataLineErr)]);
+            }
+
+            array_unshift($dataLineNew,"تم اضافه {$countLineNew} اسطر جديدة");
+
+            if($countLineExists!=0){
+                $dataLineNew [] = "الملف يحتوي على {$countLineExists} تبرعات موجوده بالفعل بالبرنامج";
+                $dataLineNew [] = "معلومات حول التبرعات الموجوده";
+                $dataLineNew = array_merge($dataLineNew,$dataLineExists);
+            }
+
+
+            \DB::commit(); // Tell Laravel this transacion's all good and it can persist to DB
+            return redirect()->back()->with(["success" => implode("<br>",$dataLineNew)]);
 
         } catch (\Exception $exp) {
 

@@ -195,10 +195,14 @@
                                    class="form-control">
                         </div>
                         <div class="col-auto">
-                            <button class="mb-2 btn btn-success" type="button" id="showbydate">عرض الجدول</button>
-                            <button class="mb-2 btn btn-success" type="button" id="showbydatereport">عرض تلخيص</button>
-
-                            <button class="mb-2 btn btn-success" type="button" id="sadkatfter">صدقة فطر</button>
+                            <button class="mb-2 btn btn-outline-info" type="button" id="showbydate">عرض الجدول</button>
+                            <button class="mb-2 btn btn-outline-info" type="button" id="showbydatereport">عرض تلخيص</button>
+                            <button class="mb-2 btn btn-outline-info" type="button" onclick="selectAll()">اختر الكل</button>
+                            <button class="mb-2 btn btn-outline-info" type="button" onclick="unSelectAll()">الغاء الاختيار</button>
+                            <button class="mb-2 btn btn-outline-info" type="button" id="exportdataline">تصدير بيانات -
+                                <span class="bg-danger-dark" style="padding: 5px;"><span id="sumlineexport" >0</span><!--₪--></span>
+                            </button>
+                            <!-- <button class="mb-2 btn btn-success" type="button" id="sadkatfter">صدقة فطر</button> -->
                         </div>
                     </div>
 

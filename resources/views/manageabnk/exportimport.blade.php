@@ -15,7 +15,7 @@
     @if (Session::has('success'))
         <div>
                 <div class="row">
-                    <div class="alert alert-success" role="alert"><strong>{{ Session::get('success') }}</strong></div>
+                    <div class="alert alert-success" role="alert"><strong>{!! Session::get('success') !!}</strong></div>
                 </div>
         </div>
     @endif
@@ -75,6 +75,42 @@
                     </div>
             </div>
         </div>
+
+            <div>
+                <div class="card card-default">
+                    <div class="card-header">فقط لملفات سجل المدخولات</div>
+                    <div class="card-body">
+                        <div class="table-responsive table-bordered">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>العمله</th>
+                                    <th>المبلغ</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                @foreach($currency as $item)
+                                <tr>
+                                    <td>
+                                        {{$item['name']}}
+                                    </td>
+                                    <td>
+                                        <div class="col-md-4">
+                                            <input class="form-control mb-2"  type="number" name="count{{$item['curn_id']}}" id="count{{$item['curn_id']}}" value="0">
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                @endforeach
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </form>
     </div>
 

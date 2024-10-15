@@ -15,6 +15,8 @@ use App\Models\Usb\Usbincome;
 use App\Traits\HelpersTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 use function PHPUnit\Framework\isEmpty;
 
 class UsbIncomeController extends Controller
@@ -84,11 +86,15 @@ class UsbIncomeController extends Controller
                     'subTitle' => 'سجل المدخولات للمشروع',
                 ]
             );
+        //->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        //->header('X-Header-One', 'Header Value')
+        //->header('X-Header-Two', 'Header Value')
     }
 
 
     public function index_entrep(Request $request, $id_entrep, $id_city)
     {
+
         if ($request->fromDate != null and $request->toDate != null) {
             $request->session()->put('showLineFromDate', $request->fromDate);
             $request->session()->put('showLineToDate', $request->toDate);
@@ -136,6 +142,8 @@ class UsbIncomeController extends Controller
          * })->get();
          **/
         $title_two = Title_two::Where('ttwo_one_id', 1)->get();
+
+
 
         //return $showLineFromDate;
         $usbincome = Usbincome::with(['enterprise', 'projects', 'city', 'income', 'currency', 'titletwo'])
@@ -381,7 +389,64 @@ class UsbIncomeController extends Controller
         $resultArr['status'] = false;
         return $resultArr;
     }
+    public function exportData(Request $request, $id_entrep, $id_proj, $id_city){
 
+        try {
+            \DB::beginTransaction();
+
+            $selectBox = $request->selectbox;
+            //$x ='';
+            /**
+            foreach ($selectBox as $v_uuid_usbincome){
+                $rowUsbincome = Usbincome::where('id_enter', $id_entrep)
+                    //->where('id_proj',$id_proj)
+                    ->where('id_city', $id_city)
+                    ->find($v_uuid_usbincome);
+                $rowUsbincome->export_at = date('Y-m-d');
+                $rowUsbincome->save();
+
+                //->whereIn('id', [1, 2, 3])
+                //->update([
+                //           'member_type' => $plan
+                //        ]);
+                //->update(['votes' => 1]);
+                //$selectBox
+
+            }
+            **/
+            //ddd($selectBox);
+            Usbincome::whereIn('uuid_usb', $selectBox)->update(['export_at' =>  Carbon::now()]);
+            $fileDb = Usbincome::whereIn('uuid_usb', $selectBox)->get()->toArray();
+            $startName = "incomeline-";
+
+            $str = "incomeline@*@" . PHP_EOL;
+            foreach ($fileDb as $item1) {
+                $str .= implode('@*@', $item1) . PHP_EOL;
+            }
+
+
+            $fileName = $startName . date('m-d-y-H-i') . ".dat";
+            Storage::disk('local')->put("public/{$fileName}", $str);
+
+            \DB::commit();
+            return response()
+                ->download(storage_path("app/public/{$fileName}"))
+                ->deleteFileAfterSend(true);
+
+
+        } catch (\Exception $exp) {
+            \DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+
+            $resultArr['status'] = false;
+            $resultArr['cls'] = 'error';
+            $resultArr['msg'] = 'حصل خطا اثناء الحفظ';
+            $resultArr['errormsg'] = $exp->getMessage();
+            return $resultArr;
+
+        }
+
+
+    }
     /**
      * @param $arrDate
      * @return array
@@ -476,6 +541,9 @@ class UsbIncomeController extends Controller
      */
     public function storeAjax(UsbIncomeRequest $request, $id_entrep, $id_proj, $id_city)
     {
+
+
+
         try {
             \DB::beginTransaction(); // Tell Laravel all the code beneath this is a transaction
 
@@ -589,6 +657,13 @@ class UsbIncomeController extends Controller
                     $resultArr['msg'] = 'خطا برقم الهاتف';
                     return $resultArr;
                 }
+            }
+
+            if($rowUsbincome->export_at != null ){
+                $resultArr['status'] = false;
+                $resultArr['cls'] = 'error';
+                $resultArr['msg'] = 'لقد تم ارسال هذه السطر - لا يمكن التعديل عليه';
+                return $resultArr;
             }
 
             $rowUsbincome->id_incom = $request->id_incom;
