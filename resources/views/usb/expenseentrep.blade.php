@@ -27,9 +27,10 @@
         <div class="card-body collapse show" id="addline">
             <form method="post" name="myform" id="myform" action="#">
                 @csrf
+                <input type="hidden" name="feter" value="{{$flgFeter}}">
                 <div class="form-row align-items-center">
 
-                    <div class="col-auto" id="divselectprog">
+                    <div class="col-auto cls-proj" id="divselectprog">
                         <label for="id_proj">المشروع</label>
                         <select name="id_proj" id="id_proj" class="custom-select custom-select-sm">
                             @foreach($projects as $item)
@@ -49,7 +50,7 @@
                             @endforeach
                             --}}
                         </select>
-                        <input class="form-control mb-2" name="id_expenseother" id="id_expenseother" type="text" placeholder="مورد او صاحب خط التوزيع">
+                        <input class="form-control mb-2" name="id_expenseother" id="id_expenseother" type="text" placeholder="مورد ">
                     </div>
 
 
@@ -102,7 +103,7 @@
                     </div>
 
 
-                    <div class="col-auto ramdanxxx">
+                    <div class="col-auto">
                         <label for="dateexpense">تاريخ الدفع</label>
                         <input class="form-control mb-2" name="dateexpense" id="dateexpense" type="date">
                     </div>
@@ -176,14 +177,13 @@
                             <th>مشروع</th>
                             <th>المورد/شخص</th>
                             <th>مبلغ</th>
-                            <th>رقم الفاتوره</th>
-                            <th>تاريخ الفاتورة</th>
-
+                            <th class="ramdan">رقم الفاتوره</th>
+                            <th class="ramdan">تاريخ الفاتورة</th>
                             <th>طريقة الدفع</th>
                             <th>تاريخ الدفع</th>
-                            <th>אסמכתא <br>מס צק, מס העברה וכו</th>
+                            <th class="ramdan">אסמכתא <br>מס צק, מס העברה וכו</th>
 
-                            <th>ملاحظه</th>
+                            <th>@if($flgFeter=='1') عدد العائلات @else ملاحظه @endif</th>
                             <th>פעולה</th>
                         </tr>
                         </thead>

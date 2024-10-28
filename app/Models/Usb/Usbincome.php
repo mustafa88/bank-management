@@ -18,7 +18,7 @@ class Usbincome extends Model
     use HasFactory ,HasUuid ,SoftDeletes;
     protected  $table = 'Usbincome';
     protected $fillable = ['uuid_usb','dateincome','id_enter','id_proj','id_city',
-        'id_incom','amount','id_curn','id_titletwo','nameclient','kabala','kabladat','phone','son','nameovid','note',
+        'id_incom','amount','id_curn','id_titletwo','nameclient','kabala','kabladat','phone','son','nameovid','note','zaka',
         'export_at','deleted_at','created_at','updated_at'];
     protected $hidden = [];
     protected $primaryKey = 'uuid_usb';

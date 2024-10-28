@@ -278,10 +278,17 @@ Route::group(['prefix' => 'usb/report_income_expense', 'namespace' => 'Usb', 'mi
 });
 
 
-
-Route::group(['prefix' => 'usb_income_entrep/{id_entrep}/{id_city}', 'namespace' => 'Usb', 'middleware' => ['auth','permprog:usb_income_entrep.show']], function () {
+/**
+Route::group(['prefix' => 'zaka/{id_entrep}/{id_city}/{id_proj}/{flgzaka?}', 'namespace' => 'Usb', 'middleware' => ['auth','permprog:zaka.show']], function () {
     //תיעוד הכנסות - USB - בחירת פרויקט
-    Route::get('show', [UsbIncomeController::class ,'index_entrep'])->name('usb_income_entrep.show');
+    //خاص للزكاه =1
+    Route::get('show', [UsbIncomeController::class ,'index_entrep'])->name('zaka.show');
+});
+**/
+
+Route::group(['prefix' => 'usb_income_entrep/{id_entrep}/{id_city}/{id_proj?}/{flgzaka?}', 'namespace' => 'Usb', 'middleware' => ['auth','permprog:usb_income_entrep.show']], function () {
+    //תיעוד הכנסות - USB - בחירת פרויקט
+    Route::get('/', [UsbIncomeController::class ,'index_entrep'])->name('usb_income_entrep.show');
 });
 
 
@@ -309,9 +316,9 @@ Route::group(['prefix' => 'usb_income/{id_entrep?}/{id_proj?}/{id_city?}', 'name
 
 });
 
-Route::group(['prefix' => 'usb_expense_entrep/{id_entrep}/{id_city}', 'namespace' => 'Usb', 'middleware' => ['auth','permprog:usb_expense_entrep.show']], function () {
+Route::group(['prefix' => 'usb_expense_entrep/{id_entrep}/{id_city}/{id_proj?}/{flgfeter?}', 'namespace' => 'Usb', 'middleware' => ['auth','permprog:usb_expense_entrep.show']], function () {
     //תיעוד הוצאות - USB - בחירת פרויקט
-    Route::get('show', [UsbExpenseController::class ,'index_entrep'])->name('usb_expense_entrep.show');
+    Route::get('/', [UsbExpenseController::class ,'index_entrep'])->name('usb_expense_entrep.show');
 
 });
 
@@ -332,13 +339,10 @@ Route::group(['prefix' => 'usb_expense/{id_entrep?}/{id_proj?}/{id_city?}', 'nam
 
 });
 
-
-
-
 Route::group(['prefix' => 'donate/{id_entrep}/{id_proj}/{id_city}', 'namespace' => 'Bank', 'middleware' => ['auth','permprog:mainDonate.show']], function () {
     //תרומב בשווה - כניסה לעמות + פרויקט
     //מסך ראשי - תרומה בשווה
-    Route::get('maindonate', [DonateworthController::class,'mainDonate'])->name('mainDonate.show');
+    Route::get('/', [DonateworthController::class,'mainDonate'])->name('mainDonate.show');
     //INSERT
     Route::post('store', [DonateworthController::class, 'storeAjax'])->name('mainDonate.storeajax');
     //EDIT

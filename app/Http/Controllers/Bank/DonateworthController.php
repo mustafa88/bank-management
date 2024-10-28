@@ -99,12 +99,14 @@ class DonateworthController extends Controller
         $donateworth = $donateworth->get();
         //return $donateworth;
 
+        $a_title = Enterprise::find($id_entrep)->name . " => ";
+        $a_title .= City::find($id_city)->city_name;
         $param_url = ['id_entrep'=>$id_entrep,'id_proj'=>$id_proj,'id_city'=>$id_city];
         return view('manageabnk.donate' , compact('donatetype','donateworth','param_url'))
             ->with(
                 [
-                    'pageTitle' => "تبرعات بقيمة",
-                    'subTitle' => 'تسجيل تبرعات بقيمة للمؤسسات',
+                    'pageTitle' => "تبرعات عينية {$a_title}",
+                    'subTitle' => 'تسجيل تبرعات عينية للمؤسسات',
                 ]
             );
     }

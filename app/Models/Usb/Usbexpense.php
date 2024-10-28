@@ -18,7 +18,7 @@ class Usbexpense extends Model
     protected $fillable = ['uuid_usb','id_enter','id_proj','id_city',
         'dateexpense','asmctaexpense',
         'id_expense','id_expenseother',
-        'amount','id_titletwo','dateinvoice','numinvoice','note','deleted_at','created_at','updated_at'];
+        'amount','id_titletwo','dateinvoice','numinvoice','note','feter','deleted_at','created_at','updated_at'];
     protected $hidden = [];
     protected $primaryKey = 'uuid_usb';
     //protected $keyType = 'string';

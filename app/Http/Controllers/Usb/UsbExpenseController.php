@@ -72,7 +72,7 @@ class UsbExpenseController extends Controller
             );
     }
 
-    public function index_entrep(Request $request,$id_entrep,$id_city)
+    public function index_entrep(Request $request,$id_entrep,$id_city,int $id_proj=-1 ,int $flgFeter=-1)
     {
         if($request->fromDate!=null and $request->toDate!=null){
             $request->session()->put('showLineFromDate',$request->fromDate);
@@ -92,7 +92,15 @@ class UsbExpenseController extends Controller
         $showLineFromDate = $request->session()->get('showLineFromDate');
         $showLineToDate = $request->session()->get('showLineToDate');
 
-        $a_title = Enterprise::find($id_entrep)->name . " => ";
+
+
+
+        if($flgFeter==1){
+            $a_title = "صدقة الفطر => ";
+        }else{
+            $a_title = Enterprise::find($id_entrep)->name . " => ";
+        }
+
         $a_title .= City::find($id_city)->city_name;
 
         $projects = Projects::whereHas('city', function ($q) use ($id_city) {
@@ -110,16 +118,35 @@ class UsbExpenseController extends Controller
             ->where('dateexpense', '<=', $showLineToDate)
             ->where('id_enter',$id_entrep)
             //->where('id_proj',$id_proj)
-            ->where('id_city',$id_city)
-            ->get();
+            ->where('id_city',$id_city);
 
+        if($flgFeter==1){
+            $usbexpense = $usbexpense->whereNotNull('feter');
+        }else{
+            $usbexpense = $usbexpense->whereNull('feter');
+        }
+
+        if($id_proj!=-1){
+            $usbexpense = $usbexpense->where('id_proj',$id_proj);
+        }
+
+
+
+        $usbexpense = $usbexpense->get();
         //return $usbexpense;
-        $param_url = ['id_entrep'=>$id_entrep,'id_city'=>$id_city];
+        $param_url = ['id_entrep'=>$id_entrep,'id_city'=>$id_city, 'id_proj' => $id_proj, 'flgFeter' => $flgFeter];
+
+        //להעלים בחירת פרויקט - مشروع = 1
+        $flgHideSelectProj = -1;
+        if($id_proj!='-1'){
+            $flgHideSelectProj = 1;
+        }
+        $param_url['flgHideSelectProj']=$flgHideSelectProj;
 
         $dataTables='v1';
         return view('usb.expenseentrep' ,
             //compact('enterprise','city','donatetype','donateworth')
-            compact('usbexpense','projects','title_two','param_url','dataTables')
+            compact('usbexpense','projects','title_two','param_url','dataTables','flgFeter')
         )
             ->with(
                 [
@@ -158,6 +185,13 @@ class UsbExpenseController extends Controller
                 $resultArr['msg'] = 'لم يتم ادخال جميع معلومات الدفع' . $request->id_titletwo;
                 return $resultArr;
             }
+
+
+            $feter = null;
+
+            if ($request->feter=='1') {
+                $feter = 1;
+            }
             $arrDate = [
                 'id_enter' =>$id_entrep,
                 'id_proj' => $id_proj,
@@ -167,6 +201,7 @@ class UsbExpenseController extends Controller
                 'id_expenseother' => $request->id_expenseother,
                 'amount' => $request->amount,
                 'note' => $request->note,
+                'feter' => $feter,
             ];
 
             if($request->id_titletwo!=""){

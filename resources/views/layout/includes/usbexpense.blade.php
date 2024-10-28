@@ -28,8 +28,8 @@
         @endif
     </td>
     <td>{{$rowData['amount']}}</td>
-    <td>{{$rowData['numinvoice']}}</td>
-    <td>{{$rowData['dateinvoice']}}</td>
+    <td class="ramdan">{{$rowData['numinvoice']}}</td>
+    <td class="ramdan">{{$rowData['dateinvoice']}}</td>
 
     <td>
         @if(is_null($rowData['id_titletwo']))
@@ -44,7 +44,7 @@
         {{$rowData['dateexpense']}}
         @endif
     </td>
-    <td>
+    <td class="ramdan">
         @if(is_null($rowData['asmctaexpense']))
             <span class="text-danger">ממתין לתשלום</span>
         @else

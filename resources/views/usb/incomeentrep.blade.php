@@ -31,9 +31,10 @@
         <div class="card-body collapse show" id="addline">
             <form method="post" name="myform" id="myform" action="#">
                 @csrf
+                <input type="hidden" name="zaka" value="{{$flgZaka}}">
                 <div class="form-row align-items-center">
 
-                    <div class="col-auto">
+                    <div class="col-auto cls-proj">
                         <label for="id_proj">المشروع</label>
                         <select name="id_proj" id="id_proj" class="custom-select custom-select-sm">
                             @foreach($projects as $item)
@@ -195,13 +196,15 @@
                                    class="form-control">
                         </div>
                         <div class="col-auto">
-                            <button class="mb-2 btn btn-outline-info" type="button" id="showbydate">عرض الجدول</button>
-                            <button class="mb-2 btn btn-outline-info" type="button" id="showbydatereport">عرض تلخيص</button>
+                            <button class="mb-2 btn btn-success" type="button" id="showbydate">عرض الجدول</button>
+                            <button class="mb-2 btn btn-success" type="button" id="showbydatereport">عرض تلخيص</button>
+                            @if($flgZaka!=1)
                             <button class="mb-2 btn btn-outline-info" type="button" onclick="selectAll()">اختر الكل</button>
                             <button class="mb-2 btn btn-outline-info" type="button" onclick="unSelectAll()">الغاء الاختيار</button>
                             <button class="mb-2 btn btn-outline-info" type="button" id="exportdataline">تصدير بيانات -
                                 <span class="bg-danger-dark" style="padding: 5px;"><span id="sumlineexport" >0</span><!--₪--></span>
                             </button>
+                            @endif
                             <!-- <button class="mb-2 btn btn-success" type="button" id="sadkatfter">صدقة فطر</button> -->
                         </div>
                     </div>

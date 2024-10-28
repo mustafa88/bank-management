@@ -35,6 +35,18 @@
                             @endforeach
                         </select>
                     </div>
+
+                    <div class="col-auto divczaka">
+
+                        <label for="enterprise">فترة الدخل</label>
+
+                        <select name="selzaka" id="selzaka" class="custom-select custom-select-sm">
+                            <option value="3" @if (request()->get('selzaka') == '3') selected @endif>حميع الاوقات</option>
+                            <option value="1" @if (request()->get('selzaka') == '1') selected @endif>لا يشمل رمضان</option>
+                            <option value="2" @if (request()->get('selzaka') == '2') selected @endif>شهر رمضان - الزكاة</option>
+                        </select>
+                    </div>
+
                     <div class="col-auto">
                         <label for="fromDate">מתאריך</label>
                         <input type="date" name="fromDate" id="fromDate" value="{{session()->get('showLineFromDate')}}"
@@ -48,7 +60,8 @@
                     </div>
 
                     <div class="col-auto">
-                        <button class="btn btn-primary mb-2" type="button" id="showData">عرض</button>
+                        <input type="submit" class="btn btn-primary mb-2" value="عرض">
+
                     </div>
 
                 </div>

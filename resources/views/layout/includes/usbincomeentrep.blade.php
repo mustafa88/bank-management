@@ -56,12 +56,12 @@
                     class="far fa-trash-alt"></i> حذف</a>
         </div>
     </div>
-
+        @if(!isset($flgZaka) or $flgZaka!=1)
     <label class="c-checkbox">
         <input type="checkbox" name="selectbox[]" class="selectbox" value="{{$rowData['uuid_usb']}}" data-amount="{{$rowData['amount']}}" >
         <span class="fa fa-check"></span>
         اختيار</label>
-
+        @endif
 
     </td>
 </tr>

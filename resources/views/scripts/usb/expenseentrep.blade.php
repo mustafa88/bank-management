@@ -20,8 +20,8 @@
                 iDisplayLength: -1
             });
 
-            InitPage();
 
+            /**
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
             if( urlParams.get('fter') != null && urlParams.get('fter')=='1'){
@@ -30,23 +30,31 @@
                 $("#id_expense").hide();
                 $('label[for="note"]').text('عدد العائلات');
                 $('label[for="id_expense"]').text('صاحب خط التوزيع');
-
-
             }else{
                 $("#divselectprog").show();
                 $("#id_expense").show();
                 $('label[for="note"]').text('ملاحظة');
                 $('label[for="id_expense"]').text('مورد');
             }
+            **/
+            InitPage();
+
+            if(_param_url['flgFeter'] != -1){
+                ramdanFter();
+            }
         });
 
 
         $('#dateexpense').on( 'change', function () {
             const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            if( urlParams.get('fter') != null && urlParams.get('fter')=='1') {
+            //const urlParams = new URLSearchParams(queryString);
+            if(_param_url['flgFeter'] != -1){
                 $("#dateinvoice").val($(this).val());
             }
+            /**
+            if( urlParams.get('fter') != null && urlParams.get('fter')=='1') {
+                $("#dateinvoice").val($(this).val());
+            }**/
         });
 
 
@@ -235,6 +243,13 @@
             let url='{{route('usb_expense_entrep.show' ,['p1','p3'])}}';
             url = urlParam(url);
 
+            if(_param_url['id_proj']!='-1'){
+                url += `/${_param_url['id_proj']}`;
+            }
+            if(_param_url['flgFeter']!='-1'){
+                url += `/${_param_url['flgFeter']}`;
+            }
+
             if(fdate=="" || tdate==""){
                 notify("תאריך לא תקין" ,"error");
                 return false;
@@ -316,6 +331,14 @@
 
             const formattedToday =  yyyy + '-' + mm + '-' + dd;
             $("#dateexpense").val('');
+            //console.log(_param_url['flgHideSelectProj']);
+            if(_param_url['flgHideSelectProj'] != -1){
+                //alert('aa');
+                $("#id_proj").val(_param_url['id_proj']).change();
+                $(".cls-proj").hide();
+
+            }
+
 
 
 
@@ -326,6 +349,12 @@
          * رمضان - صدقة القطر
          */
         function ramdanFter(){
+            ///NEXTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+            $("#id_expense").hide();
+            $('label[for="id_expense"]').text('صاحب خط التوزيع');
+            $('#id_expenseother').attr('placeholder', 'صاحب خط التوزيع');
+
+            $('label[for="note"]').text('عدد العائلات');
 
             let today = new Date();
             let yyyy = today.getFullYear();

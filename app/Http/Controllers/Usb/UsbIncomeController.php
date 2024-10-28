@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
-use function PHPUnit\Framework\isEmpty;
+//use function PHPUnit\Framework\isEmpty;
 
 class UsbIncomeController extends Controller
 {
@@ -31,6 +31,8 @@ class UsbIncomeController extends Controller
      */
     public function index(Request $request, $id_entrep, $id_proj, $id_city)
     {
+
+        /**
 
         if ($request->fromDate != null and $request->toDate != null) {
             $request->session()->put('showLineFromDate', $request->fromDate);
@@ -63,6 +65,7 @@ class UsbIncomeController extends Controller
 
 
         $usbincome = Usbincome::with(['enterprise', 'projects', 'city', 'income', 'currency', 'titletwo'])
+            ->whereNotNull('zaka')
             ->where('dateincome', '>=', $showLineFromDate)
             ->where('dateincome', '<=', $showLineToDate)
             ->where('id_enter', $id_entrep)
@@ -86,14 +89,15 @@ class UsbIncomeController extends Controller
                     'subTitle' => 'سجل المدخولات للمشروع',
                 ]
             );
-        //->header('Cache-Control', 'no-cache, no-store, must-revalidate')
-        //->header('X-Header-One', 'Header Value')
-        //->header('X-Header-Two', 'Header Value')
+         *
+         */
+
     }
 
 
-    public function index_entrep(Request $request, $id_entrep, $id_city)
+    public function index_entrep(Request $request,int $id_entrep,int $id_city ,int $id_proj=-1 ,int $flgZaka=-1)
     {
+
 
         if ($request->fromDate != null and $request->toDate != null) {
             $request->session()->put('showLineFromDate', $request->fromDate);
@@ -121,7 +125,12 @@ class UsbIncomeController extends Controller
         $showLineFromDate = $request->session()->get('showLineFromDate');
         $showLineToDate = $request->session()->get('showLineToDate');
 
-        $a_title = Enterprise::find($id_entrep)->name . " => ";
+        if($flgZaka==1){
+            $a_title = "زكاة => ";
+        }else{
+            $a_title = Enterprise::find($id_entrep)->name . " => ";
+        }
+
         $a_title .= City::find($id_city)->city_name;
 
         $currency = Currency::get();
@@ -147,22 +156,41 @@ class UsbIncomeController extends Controller
 
         //return $showLineFromDate;
         $usbincome = Usbincome::with(['enterprise', 'projects', 'city', 'income', 'currency', 'titletwo'])
+
             ->where('dateincome', '>=', $showLineFromDate)
             ->where('dateincome', '<=', $showLineToDate)
             ->where('id_enter', $id_entrep)
             //->where('id_proj',$id_proj)
-            ->where('id_city', $id_city)
-            ->get();
+            ->where('id_city', $id_city);
 
-        //return $usbincome;
+        //return $flgZaka;
+        if($flgZaka==1){
+           $usbincome = $usbincome->whereNotNull('zaka');
+        }else{
+            $usbincome = $usbincome->whereNull('zaka');
+        }
+
+        if($id_proj!=-1){
+            $usbincome = $usbincome->where('id_proj',$id_proj);
+        }
+
+        $usbincome = $usbincome->get();
 
 
-        $param_url = ['id_entrep' => $id_entrep, 'id_city' => $id_city];
+        $param_url = ['id_entrep' => $id_entrep, 'id_city' => $id_city, 'id_proj' => $id_proj, 'flgZaka' => $flgZaka];
+
+        //להעלים בחירת פרויקט - مشروع = 1
+        $flgHideSelectProj = -1;
+        if($id_proj!='-1'){
+            $flgHideSelectProj = 1;
+        }
+        $param_url['flgHideSelectProj']=$flgHideSelectProj;
 
         $dataTables = 'v1';
         return view('usb.incomeentrep',
             //compact('enterprise','city','donatetype','donateworth')
-            compact('usbincome', 'projects', 'currency', 'title_two', 'param_url', 'dataTables')
+            compact('id_proj','usbincome', 'projects',
+                'currency', 'title_two', 'param_url', 'dataTables', 'flgZaka')
         )
             ->with(
                 [
@@ -188,9 +216,13 @@ class UsbIncomeController extends Controller
             $request->session()->put('showLineToDate', date('Y-12-31'));
         }
 
+        //ם המשתמש מסתיים ב zka - לא יינתן לחזור אחורה בתאריכים ליותר מיום אחד
         $chekZka = substr($request->user()->username,-3) =='zka' ? 1:0 ;
 
         $lastDayDate = (new \DateTime())->modify('-1 day')->format('Y-m-d');
+
+        //ברירת מחדל 3 = כל התקופות
+        $selzaka = $request->input('selzaka', '3');
 
         if($chekZka &&  $request->session()->get('showLineFromDate') <$lastDayDate){
             //משתממש ZKA לא יכול לחזור בתאריכים יותר מיום אחד
@@ -200,6 +232,8 @@ class UsbIncomeController extends Controller
 
         $showLineFromDate = $request->session()->get('showLineFromDate');
         $showLineToDate = $request->session()->get('showLineToDate');
+
+
 
         $a_title="";
         if($id_entrep!=null){
@@ -213,8 +247,17 @@ class UsbIncomeController extends Controller
             ->leftJoin('city', 'city.city_id', '=', 'Usbincome.id_city')
             ->where('dateincome', '>=', $showLineFromDate)
             ->where('dateincome', '<=', $showLineToDate)
-            ->where('id_enter', $id_entrep)
-            ->get();
+            ->where('id_enter', $id_entrep);
+        switch ($selzaka){
+            case "1":
+                $allCity = $allCity->whereNull('zaka');
+                break;
+            case "2":
+                $allCity = $allCity->whereNotNull('zaka');
+                break;
+        }
+
+        $allCity =$allCity->get();
         //return $allCity;
 
         $income_title_curr = [];
@@ -229,8 +272,18 @@ class UsbIncomeController extends Controller
                 ->where('dateincome', '<=', $showLineToDate)
                 ->where('id_enter', $id_entrep)
                 ->where('id_city', $item_city['id_city'])
-                ->groupBy('title_two.ttwo_text', 'currency.symbol')
-                ->get();
+                ->groupBy('title_two.ttwo_text', 'currency.symbol');
+
+            switch ($selzaka){
+                case "1":
+                    $result = $result->whereNull('zaka');
+                    break;
+                case "2":
+                    $result = $result->whereNotNull('zaka');
+                    break;
+            }
+            $result =$result->get();
+
             $income_title_curr[$item_city['id_city']] = $result;
         }
 
@@ -247,8 +300,16 @@ class UsbIncomeController extends Controller
                 ->where('dateincome', '<=', $showLineToDate)
                 ->where('id_enter', $id_entrep)
                 ->where('id_city', $item_city['id_city'])
-                ->groupBy('income.name', 'currency.symbol')
-                ->get();
+                ->groupBy('income.name', 'currency.symbol');
+            switch ($selzaka){
+                case "1":
+                    $result = $result->whereNull('zaka');
+                    break;
+                case "2":
+                    $result = $result->whereNotNull('zaka');
+                    break;
+            }
+            $result =$result->get();
             $income_typeincom_curr[$item_city['id_city']] = $result;
         }
 
@@ -265,8 +326,16 @@ class UsbIncomeController extends Controller
                 ->where('dateincome', '<=', $showLineToDate)
                 ->where('id_enter', $id_entrep)
                 ->where('id_city', $item_city['id_city'])
-                ->groupBy('Projects.name','income.name', 'currency.symbol')
-                ->get();
+                ->groupBy('Projects.name','income.name', 'currency.symbol');
+            switch ($selzaka){
+                case "1":
+                    $result = $result->whereNull('zaka');
+                    break;
+                case "2":
+                    $result = $result->whereNotNull('zaka');
+                    break;
+            }
+            $result =$result->get();
             $income_proj_typeincom_curr[$item_city['id_city']] = $result;
         }
 
@@ -283,8 +352,16 @@ class UsbIncomeController extends Controller
                 ->where('dateincome', '<=', $showLineToDate)
                 ->where('id_enter', $id_entrep)
                 ->where('id_city', $item_city['id_city'])
-                ->groupBy('title_two.ttwo_text','income.name', 'currency.symbol')
-                ->get();
+                ->groupBy('title_two.ttwo_text','income.name', 'currency.symbol');
+            switch ($selzaka){
+                case "1":
+                    $result = $result->whereNull('zaka');
+                    break;
+                case "2":
+                    $result = $result->whereNotNull('zaka');
+                    break;
+            }
+            $result =$result->get();
             $income_title_typeincom_curr[$item_city['id_city']] = $result;
         }
 
@@ -301,8 +378,18 @@ class UsbIncomeController extends Controller
                 ->where('dateexpense', '<=', $showLineToDate)
                 ->where('id_enter',$id_entrep)
                 ->where('id_city',$item_city['id_city'])
-                ->groupBy('title_two.ttwo_text')
-                ->get();
+                ->groupBy('title_two.ttwo_text');
+
+            switch ($selzaka){
+                case "1":
+                    $result = $result->whereNull('feter');
+                    break;
+                case "2":
+                    $result = $result->whereNotNull('feter');
+                    break;
+            }
+            $result =$result->get();
+
             $expense_title[$item_city['id_city']] = $result;
         }
 
@@ -318,8 +405,17 @@ class UsbIncomeController extends Controller
                 ->where('dateexpense', '<=', $showLineToDate)
                 ->where('id_enter',$id_entrep)
                 ->where('id_city',$item_city['id_city'])
-                ->groupBy('Projects.name','title_two.ttwo_text')
-                ->get();
+                ->groupBy('Projects.name','title_two.ttwo_text');
+
+            switch ($selzaka){
+                case "1":
+                    $result = $result->whereNull('feter');
+                    break;
+                case "2":
+                    $result = $result->whereNotNull('feter');
+                    break;
+            }
+            $result =$result->get();
             $expense_proj_title[$item_city['id_city']] = $result;
         }
 
@@ -331,8 +427,16 @@ class UsbIncomeController extends Controller
                 ->where('dateincome', '>=', $showLineFromDate)
                 ->where('dateincome', '<=', $showLineToDate)
                 ->where('id_enter', $id_entrep)
-                ->where('id_city', $item_city['id_city'])
-                ->get();
+                ->where('id_city', $item_city['id_city']);
+            switch ($selzaka){
+                case "1":
+                    $result = $result->whereNull('zaka');
+                    break;
+                case "2":
+                    $result = $result->whereNotNull('zaka');
+                    break;
+            }
+            $result =$result->get();
             $income_all_table[$item_city['id_city']] = $result;
 
             //טבלת כל ההוצאות
@@ -341,8 +445,17 @@ class UsbIncomeController extends Controller
                 ->where('dateexpense', '>=', $showLineFromDate)
                 ->where('dateexpense', '<=', $showLineToDate)
                 ->where('id_enter',$id_entrep)
-                ->where('id_city',$item_city['id_city'])
-                ->get();
+                ->where('id_city',$item_city['id_city']);
+
+            switch ($selzaka){
+                case "1":
+                    $result = $result->whereNull('feter');
+                    break;
+                case "2":
+                    $result = $result->whereNotNull('feter');
+                    break;
+            }
+            $result =$result->get();
             $expense_all_table[$item_city['id_city']] = $result;
         }
 
@@ -541,9 +654,6 @@ class UsbIncomeController extends Controller
      */
     public function storeAjax(UsbIncomeRequest $request, $id_entrep, $id_proj, $id_city)
     {
-
-
-
         try {
             \DB::beginTransaction(); // Tell Laravel all the code beneath this is a transaction
 
@@ -567,6 +677,12 @@ class UsbIncomeController extends Controller
             if (isset($request->son)) {
                 $son = '1';
             }
+
+            $zaka = null;
+
+            if ($request->zaka=='1') {
+                $zaka = 1;
+            }
             $dateincome = date('Y-m-d');
             $arrDate = [
                 'dateincome' => $dateincome,
@@ -584,6 +700,7 @@ class UsbIncomeController extends Controller
                 'son' => $son,
                 'nameovid' => $request->nameovid,
                 'note' => $request->note,
+                'zaka' => $zaka,
             ];
 
             $resultCheck = $this->checkBeforeSave($arrDate);

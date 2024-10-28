@@ -6,6 +6,7 @@
 
         let _param_url  ={!! json_encode($param_url) !!};
 
+        //let _idProject = {{$id_proj}};
         $(document).ready(function(){
             myTable = $('#datatable1').DataTable({
                 'paging': true, // Table pagination
@@ -97,10 +98,10 @@
             let resultAjax = SendToAjax(url,'GET');
 
             if(!resultAjax['status']){
-                return false;c
+                return false;
             }
             let row = resultAjax['row'];
-            console.log(row)
+            //console.log(row)
             $("#listkabala").show();
             for(let i=0;i<row.length;i++){
                 $('#listkabalabody').append(`<tr><td>${row[i]['dateincome']}</td><td>${row[i]['nameclient']}</td><td>${row[i]['amount']}${row[i]['currency']['symbol']}</td><td>${row[i]['income']['name']}</td><td>${row[i]['titletwo']['ttwo_text']}</td></tr>`);
@@ -126,10 +127,13 @@
                 let url= '{{route('usb_income.storeajax',['p1','p2','p3'])}}';
                 url = urlParam(url);
                 //console.log(url);
-
+               // alert(url);
                 //return url;
                 let resultAjax = SendToAjax(url,'POST');
                 //console.log(resultAjax);
+                //console.log(resultAjax);
+                //alert(url);
+                //return;
                 if(resultAjax==undefined){
                     notify('حدث خطأ','error');
                     return false;
@@ -151,9 +155,12 @@
                 let url= '{{route('usb_income.updateajax',['p1','p2','p3'])}}';
                 url = urlParam(url,id_line);
 
+                //console.log(url);
+                //alert(url);
                 let resultAjax = SendToAjax(url,'PUT');
                 //console.log(resultAjax);
-                //return;
+                //alert(url);
+                // return;
                 if(resultAjax==undefined){
                     notify('حدث خطأ','error');
                     return false;
@@ -269,9 +276,19 @@
         $(document).on('click', '#showbydate', function (e) {
             var fdate= $("#fromdate").val();
             var tdate= $("#todate").val();
-            let url='{{route('usb_income_entrep.show' ,['p1','p3'])}}';
+            let url='{{route('usb_income_entrep.show' ,['p1','p3'])}}';//שינוי
             url = urlParam(url);
+            //alert(_param_url['flgZaka']);
 
+            if(_param_url['id_proj']!='-1'){
+                url += `/${_param_url['id_proj']}`;
+            }
+
+            if(_param_url['flgZaka']!='-1'){
+                url += `/${_param_url['flgZaka']}`;
+            }
+            //alert(url);
+            //return;
             if(fdate=="" || tdate==""){
                 notify("תאריך לא תקין" ,"error");
                 return false;
@@ -322,8 +339,7 @@
             form.submit();*/
 
         });
-
-        $('.selectbox').on( 'change', function () {
+        $(document).on('change', '.selectbox', function (e) {
             //alert(this.checked);
             let x = $("#sumlineexport").text();
             if(x==''){
@@ -372,6 +388,9 @@
         function InitPage(customRest){
 
             myRowTable=null;
+
+
+
             $("#id_line").val('0');
 
             $('#kabala').change();
@@ -380,7 +399,12 @@
                 $("#amount").val('');
                 return;
             }
-            $("#id_proj").val('1').change();
+
+            //$("#id_proj").val('1').change();
+            //לסמן בחירה ראשונה תמיד
+            $("#id_proj").val($("#id_proj option:first").val()).change();
+
+
             $("#nameclient").val('');
             $("#amount").val('');//
             $("#id_curn").val('1');
@@ -402,6 +426,13 @@
 
             const formattedToday =  yyyy + '-' + mm + '-' + dd;
             $("#kabladat").val(formattedToday);
+
+
+            //if(_param_url['id_proj'] != -1){
+            if(_param_url['flgHideSelectProj'] != -1){
+                $("#id_proj").val(_param_url['id_proj']).change();
+                $(".cls-proj").hide();
+            }
         }
 
     </script>

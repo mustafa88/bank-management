@@ -99,8 +99,9 @@ class ExportImportController extends Controller
                     $fileDb = Donatetype::get()->toArray();
                     $startName = "donatetype-";
                     break;
-                case "income":
-                    $fileDb = Usbincome::withTrashed()->get()->toArray();
+                case "income":;
+                    //مدخولات الزكاه فقط
+                    $fileDb = Usbincome::whereNotNull('zaka')->withTrashed()->get()->toArray();
                     //return $fileDb;
                     $startName = "income-";
                     break;
@@ -165,15 +166,15 @@ class ExportImportController extends Controller
                 break;
             case "incomeline":// הכנסות דיווח שוורת מסויימות
                 //הכנסות
-                $lenArr = 20;
+                $lenArr = 21;
                 break;
             case "income"://הכנסות - הל ההכנסות
                 //הכנסות
-                $lenArr = 20;
+                $lenArr = 21;
                 break;
             case "expense":
                 //הוצאות
-                $lenArr = 16;
+                $lenArr = 17;
                 break;
             case "adahi":
                 //הוצאות
@@ -202,7 +203,7 @@ class ExportImportController extends Controller
             }
 
             if (count($data) != $lenArr) {
-                ddd('error count line');
+                ddd(count($data),$lenArr, 'error count line');
             }
             $dataDat[] = $data;
         }
@@ -231,7 +232,7 @@ class ExportImportController extends Controller
                 return $this->import_income_line($dataDat,$listCurrencyPost);
 
                 break;
-            case "income"://הכנסות - הל ההכנסות
+            case "income"://הכנסות - الزكاة
                 //הכנסות
                 return $this->import_income_forzaka($dataDat);
                 break;
@@ -404,7 +405,7 @@ class ExportImportController extends Controller
             foreach ($dataDat as $item) {
 
                 $uuid_income = $item[0];
-                $updated_at_file = substr($item[18], 0, 10) . " " . substr($item[18], 11, 8);
+                $updated_at_file = substr($item[20], 0, 10) . " " . substr($item[20], 11, 8);
 
                 $usbincome_check = Usbincome::withTrashed()->find($uuid_income);
 
@@ -415,7 +416,7 @@ class ExportImportController extends Controller
                     //ddd($donateworth_check->updated_at->toW3cString());
                     //UPDATE
                     //שורה קיימת לבדוק את תאריך עדכון שונה - ואז צריך לעדכן את כל השורה אחרת מדלגים
-                    //ddd($updated_at_db,$updated_at_file);
+                    //ddd($updated_at_db,$updated_at_file,$item);
                     if ($updated_at_db != $updated_at_file) {
                         $usbincome_check->dateincome = $item[1];
                         $usbincome_check->id_enter = $item[2];
@@ -432,10 +433,11 @@ class ExportImportController extends Controller
                         $usbincome_check->son = $item[13]==''?null:$item[13];
                         $usbincome_check->nameovid = $item[14]==''?null:$item[14];
                         $usbincome_check->note = $item[15]==''?null:$item[15];
-                        $usbincome_check->export_at = $item[16]==''?null:$item[16];
-                        $usbincome_check->deleted_at = $item[17]==''?null:$item[17];
-                        $usbincome_check->created_at = $item[18];
-                        $usbincome_check->updated_at = $item[19];
+                        $usbincome_check->zaka = $item[16]==''?null:$item[16];
+                        $usbincome_check->export_at = $item[17]==''?null:$item[17];
+                        $usbincome_check->deleted_at = $item[18]==''?null:$item[18];
+                        $usbincome_check->created_at = $item[19];
+                        $usbincome_check->updated_at = $item[20];
                         $usbincome_check->save();
                         $updateCount++;
                     }
@@ -460,14 +462,14 @@ class ExportImportController extends Controller
                     'son' => $item[13]==''?null:$item[13],
                     'nameovid' => $item[14]==''?null:$item[14],
                     'note' => $item[15]==''?null:$item[15],
-                    'export_at' => $item[16]==''?null:$item[16],
-                    'deleted_at' => $item[17]==''?null:$item[17],
-                    'created_at' => $item[18],
-                    'updated_at' => $item[19],
+                    'zaka' => $item[16]==''?null:$item[16],
+                    'export_at' => $item[17]==''?null:$item[17],
+                    'deleted_at' => $item[18]==''?null:$item[18],
+                    'created_at' => $item[19],
+                    'updated_at' => $item[20],
                 ]);
                 $insertCount++;
             }
-
 
 
             \DB::commit(); // Tell Laravel this transacion's all good and it can persist to DB
@@ -510,7 +512,7 @@ class ExportImportController extends Controller
             foreach ($dataDat as $item) {
 
                 $uuid_income = $item[0];
-                $updated_at_file = substr($item[18], 0, 10) . " " . substr($item[18], 11, 8);
+                $updated_at_file = substr($item[20], 0, 10) . " " . substr($item[20], 11, 8);
 
                 $usbincome_check = Usbincome::withTrashed()->find($uuid_income);
                 if ($usbincome_check) {
@@ -558,10 +560,11 @@ class ExportImportController extends Controller
                     'son' => $item[13]==''?null:$item[13],
                     'nameovid' => $item[14]==''?null:$item[14],
                     'note' => $item[15]==''?null:$item[15],
-                    'export_at' => $item[16]==''?null:$item[16],
-                    'deleted_at' => $item[17]==''?null:$item[17],
-                    'created_at' => $item[18],
-                    'updated_at' => $item[19],
+                    'zaka' => $item[16]==''?null:$item[16],
+                    'export_at' => $item[17]==''?null:$item[17],
+                    'deleted_at' => $item[18]==''?null:$item[18],
+                    'created_at' => $item[19],
+                    'updated_at' => $item[20],
                 ]);
                 $countLineNew++;
                 $dataLineNew[] = "رقم الوصل {$item[10]} - مبلغ {$item[6]}{$detailsCurrency[$item[7]]}";
@@ -625,7 +628,7 @@ class ExportImportController extends Controller
             foreach ($dataDat as $item) {
 
                 $uuid_expense = $item[0];
-                $updated_at_file = substr($item[15], 0, 10) . " " . substr($item[15], 11, 8);
+                $updated_at_file = substr($item[16], 0, 10) . " " . substr($item[16], 11, 8);
                 //ddd($updated_at);
                 $usbexpense_check = Usbexpense::withTrashed()->find($uuid_expense);
 
@@ -648,9 +651,10 @@ class ExportImportController extends Controller
                         $usbexpense_check->dateinvoice = $item[10]==''?null:$item[10];
                         $usbexpense_check->numinvoice = $item[11]==''?null:$item[11];
                         $usbexpense_check->note = $item[12]==''?null:$item[12];
-                        $usbexpense_check->deleted_at = $item[13]==''?null:$item[13];
-                        $usbexpense_check->created_at = $item[14];
-                        $usbexpense_check->updated_at = $item[15];
+                        $usbexpense_check->feter = $item[13]==''?null:$item[13];
+                        $usbexpense_check->deleted_at = $item[14]==''?null:$item[14];
+                        $usbexpense_check->created_at = $item[15];
+                        $usbexpense_check->updated_at = $item[16];
                         //RETURN $usbexpense_check;
                         $usbexpense_check->save();
                         $updateCount++;
@@ -673,9 +677,10 @@ class ExportImportController extends Controller
                     'dateinvoice' => $item[10]==''?null:$item[10],
                     'numinvoice' => $item[11]==''?null:$item[11],
                     'note' => $item[12]==''?null:$item[12],
-                    'deleted_at' => $item[13]==''?null:$item[13],
-                    'created_at' => $item[14],
-                    'updated_at' => $item[15],
+                    'feter' => $item[13]==''?null:$item[13],
+                    'deleted_at' => $item[14]==''?null:$item[14],
+                    'created_at' => $item[15],
+                    'updated_at' => $item[16],
                 ]);
                 $insertCount++;
             }
