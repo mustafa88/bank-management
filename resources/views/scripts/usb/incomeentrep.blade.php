@@ -5,7 +5,7 @@
         let myTable,myRowTable=null;
 
         let _param_url  ={!! json_encode($param_url) !!};
-
+        console.log(_param_url);
         //let _idProject = {{$id_proj}};
         $(document).ready(function(){
             myTable = $('#datatable1').DataTable({
@@ -81,10 +81,10 @@
             for(let i=0;i<resultAjax.length;i++){
                 $('#id_incom').append(`<option value="${resultAjax[i]['id']}">  ${resultAjax[i]['name']} </option>`);
             }
-
+            $('#id_incom').change();
             _param_url['id_proj']= $('#id_proj').val();
 
-        }).change();
+        });
 
         $('#kabala').on( 'change', function () {
             //להציג קבלות לאותו מס קבלה
@@ -108,6 +108,17 @@
             }
 
         });
+
+
+
+        $('#id_incom').on( 'change', function () {
+            $(".cls-shovar-heyov").hide();
+            if($('#id_incom').val()=='10'){
+               $(".cls-shovar-heyov").show();
+            }
+
+        });
+
         /**
          * שמירה
          * save new data or update data exists
@@ -117,8 +128,15 @@
             let id_line = $("#id_line").val();
 
             if((id_line=='0' && myRowTable!=null) || (id_line!='0' && myRowTable==null)){
-                notify('תקלה - נא לדווח לאיש מחשוב');
+                notify('תקלה - נא לדווח לאיש מחשוב','error');
                 return;
+            }
+            if($("#id_incom").val()=='9'){
+                //استعاره - رقم هاتف ضروري
+                if($("#phone").val()==''){
+                    notify('وصل من نوع استعاره - يجب ادخال رفم الهاتف','error');
+                    return;
+                }
             }
 
             //alert(id_line);
@@ -216,10 +234,16 @@
 
             $("#id_proj").val(row.id_proj).change();
             $("#nameclient").val(row.nameclient);
-            $("#amount").val(row.amount);
+            $("#amount").val(Math.abs(row.amount));
             $("#id_curn").val(row.id_curn);
             $("#id_titletwo").val(row.id_titletwo);
-            $("#id_incom").val(row.id_incom);
+            $("#id_incom").val(row.id_incom).change();
+            if(row.id_incom=='10'){
+                //רק אם סוג ارجاع استعارة להציג ולכתוב מס שבור
+                $("#shovarheyov").val(row.kabala_zekou_heyov);
+            }
+
+
             $("#kabala").val(row.kabala).change();
             $("#nameovid").val(row.nameovid);
             $("#note").val(row.note);
@@ -402,7 +426,7 @@
 
             //$("#id_proj").val('1').change();
             //לסמן בחירה ראשונה תמיד
-            $("#id_proj").val($("#id_proj option:first").val()).change();
+            //$("#id_proj").val($("#id_proj option:first").val()).change();
 
 
             $("#nameclient").val('');
@@ -415,6 +439,7 @@
             $("#phone").val('');
             $("#son").prop('checked', false);
             $("#note").val('');
+            $("#shovarheyov").val('');
             //$("#nameovid").val('');
             let today = new Date();
             let yyyy = today.getFullYear();
@@ -428,11 +453,15 @@
             $("#kabladat").val(formattedToday);
 
 
+            if(_param_url['id_proj']!='-1'){
+                $("#id_proj").val(_param_url['id_proj']);
+            }
             //if(_param_url['id_proj'] != -1){
             if(_param_url['flgHideSelectProj'] != -1){
-                $("#id_proj").val(_param_url['id_proj']).change();
                 $(".cls-proj").hide();
             }
+            $("#id_proj").change();
+            $('#id_incom').change();
         }
 
     </script>

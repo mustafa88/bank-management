@@ -166,11 +166,11 @@ class ExportImportController extends Controller
                 break;
             case "incomeline":// הכנסות דיווח שוורת מסויימות
                 //הכנסות
-                $lenArr = 21;
+                $lenArr = 22;
                 break;
             case "income"://הכנסות - הל ההכנסות
                 //הכנסות
-                $lenArr = 21;
+                $lenArr = 22;
                 break;
             case "expense":
                 //הוצאות
@@ -434,10 +434,11 @@ class ExportImportController extends Controller
                         $usbincome_check->nameovid = $item[14]==''?null:$item[14];
                         $usbincome_check->note = $item[15]==''?null:$item[15];
                         $usbincome_check->zaka = $item[16]==''?null:$item[16];
-                        $usbincome_check->export_at = $item[17]==''?null:$item[17];
-                        $usbincome_check->deleted_at = $item[18]==''?null:$item[18];
-                        $usbincome_check->created_at = $item[19];
-                        $usbincome_check->updated_at = $item[20];
+                        $usbincome_check->kabala_zekou_heyov = $item[17]==''?null:$item[17];
+                        $usbincome_check->export_at = $item[18]==''?null:$item[18];
+                        $usbincome_check->deleted_at = $item[19]==''?null:$item[19];
+                        $usbincome_check->created_at = $item[20];
+                        $usbincome_check->updated_at = $item[21];
                         $usbincome_check->save();
                         $updateCount++;
                     }
@@ -463,10 +464,11 @@ class ExportImportController extends Controller
                     'nameovid' => $item[14]==''?null:$item[14],
                     'note' => $item[15]==''?null:$item[15],
                     'zaka' => $item[16]==''?null:$item[16],
-                    'export_at' => $item[17]==''?null:$item[17],
-                    'deleted_at' => $item[18]==''?null:$item[18],
-                    'created_at' => $item[19],
-                    'updated_at' => $item[20],
+                    'kabala_zekou_heyov' => $item[17]==''?null:$item[17],
+                    'export_at' => $item[18]==''?null:$item[18],
+                    'deleted_at' => $item[19]==''?null:$item[19],
+                    'created_at' => $item[20],
+                    'updated_at' => $item[21],
                 ]);
                 $insertCount++;
             }
@@ -561,10 +563,11 @@ class ExportImportController extends Controller
                     'nameovid' => $item[14]==''?null:$item[14],
                     'note' => $item[15]==''?null:$item[15],
                     'zaka' => $item[16]==''?null:$item[16],
-                    'export_at' => $item[17]==''?null:$item[17],
-                    'deleted_at' => $item[18]==''?null:$item[18],
-                    'created_at' => $item[19],
-                    'updated_at' => $item[20],
+                    'kabala_zekou_heyov' => $item[17]==''?null:$item[17],
+                    'export_at' => $item[18]==''?null:$item[18],
+                    'deleted_at' => $item[19]==''?null:$item[19],
+                    'created_at' => $item[20],
+                    'updated_at' => $item[21],
                 ]);
                 $countLineNew++;
                 $dataLineNew[] = "رقم الوصل {$item[10]} - مبلغ {$item[6]}{$detailsCurrency[$item[7]]}";

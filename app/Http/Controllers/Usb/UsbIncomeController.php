@@ -125,12 +125,15 @@ class UsbIncomeController extends Controller
         $showLineFromDate = $request->session()->get('showLineFromDate');
         $showLineToDate = $request->session()->get('showLineToDate');
 
+        $a_title = "";
         if($flgZaka==1){
-            $a_title = "زكاة => ";
-        }else{
-            $a_title = Enterprise::find($id_entrep)->name . " => ";
+            $a_title .= "زكاة => ";
         }
 
+        $a_title .= Enterprise::find($id_entrep)->name . " => ";
+        if($id_proj!= -1){
+            $a_title .= Projects::find($id_proj)->name . " => ";
+        }
         $a_title .= City::find($id_city)->city_name;
 
         $currency = Currency::get();
@@ -181,7 +184,7 @@ class UsbIncomeController extends Controller
 
         //להעלים בחירת פרויקט - مشروع = 1
         $flgHideSelectProj = -1;
-        if($id_proj!='-1'){
+        if($id_proj!=-1){
             $flgHideSelectProj = 1;
         }
         $param_url['flgHideSelectProj']=$flgHideSelectProj;
@@ -683,6 +686,68 @@ class UsbIncomeController extends Controller
             if ($request->zaka=='1') {
                 $zaka = 1;
             }
+            $amount = $request->amount;
+            if($request->id_incom == 10){
+                //اعادة الاستعارة
+                $amount = abs($amount) * -1;
+            }
+
+
+
+            $shovarheyov = null;
+            if(is_numeric($request->shovarheyov) and $request->shovarheyov>0){
+
+                $shovarheyov = $request->shovarheyov;
+
+                if($request->id_incom!='10'){
+                    $resultArr['status'] = false;
+                    $resultArr['cls'] = 'error';
+                    $resultArr['msg'] = 'يجب ان يكون نوع التبرع ارجاع الاستعاره';
+                    return $resultArr;
+                }
+
+                $rowCheck = Usbincome::where('kabala',$shovarheyov)->get();;
+
+                if ($rowCheck->isNotEmpty()) {
+
+                    if($rowCheck[0]['id_incom']!='9'){
+                        $resultArr['status'] = false;
+                        $resultArr['cls'] = 'error';
+                        $resultArr['msg'] = 'يجب ان يكون رقم وصل الاستعاره من نوع استعارة' . $shovarheyov;
+                        return $resultArr;
+                    }
+
+                    if($rowCheck[0]['amount'] < abs($amount)  ){
+                        $resultArr['status'] = false;
+                        $resultArr['cls'] = 'error';
+                        $resultArr['msg'] = 'مبلغ الارجاع اكبر من مبلغ الاستعاره';
+                        return $resultArr;
+                    }
+                    if(  $rowCheck[0]['id_curn'] != $request->id_curn ){
+                        $resultArr['status'] = false;
+                        $resultArr['cls'] = 'error';
+                        $resultArr['msg'] = 'عملة الاستعاره مختلفة عن عملة الارجاع';
+                        return $resultArr;
+                    }
+
+                }else{
+                    $resultArr['status'] = false;
+                    $resultArr['cls'] = 'error';
+                    $resultArr['msg'] = 'وصل غير موجود';
+                    return $resultArr;
+                }
+
+                //לעדכן שובר הזיכוי בקבלת החיוב
+                $rowUsbincomeUpdt = Usbincome::where('id_enter', $id_entrep)
+                        ->where('id_city', $id_city)
+                        ->find($rowCheck[0]['uuid_usb']);
+
+                $rowUsbincomeUpdt->kabala_zekou_heyov = $request->kabala;
+                $rowUsbincomeUpdt->save();
+
+
+            }
+
             $dateincome = date('Y-m-d');
             $arrDate = [
                 'dateincome' => $dateincome,
@@ -690,7 +755,7 @@ class UsbIncomeController extends Controller
                 'id_proj' => $id_proj,
                 'id_city' => $id_city,
                 'id_incom' => $request->id_incom,
-                'amount' => $request->amount,
+                'amount' => $amount,
                 'id_curn' => $request->id_curn,
                 'id_titletwo' => $request->id_titletwo,
                 'nameclient' => $request->nameclient,
@@ -701,6 +766,7 @@ class UsbIncomeController extends Controller
                 'nameovid' => $request->nameovid,
                 'note' => $request->note,
                 'zaka' => $zaka,
+                'kabala_zekou_heyov' => $shovarheyov
             ];
 
             $resultCheck = $this->checkBeforeSave($arrDate);
@@ -709,6 +775,8 @@ class UsbIncomeController extends Controller
             }
 
             $rowinsert = Usbincome::create($arrDate);
+
+
 
             $rowUsbincome = Usbincome::with(['enterprise', 'projects', 'city', 'income', 'currency', 'titletwo'])->find($rowinsert->uuid_usb);
 
@@ -776,6 +844,15 @@ class UsbIncomeController extends Controller
                 }
             }
 
+
+
+            if($rowUsbincome->kabala_zekou_heyov != null ){
+                $resultArr['status'] = false;
+                $resultArr['cls'] = 'error';
+                $resultArr['msg'] = 'يوجد وصل ارجاع لا يمكن التعديل';
+                return $resultArr;
+            }
+
             if($rowUsbincome->export_at != null ){
                 $resultArr['status'] = false;
                 $resultArr['cls'] = 'error';
@@ -783,9 +860,27 @@ class UsbIncomeController extends Controller
                 return $resultArr;
             }
 
+
+
+            $son = null;
+            if (isset($request->son)) {
+                $son = '1';
+            }
+
+            $amount = $request->amount;
+            if($request->id_incom == 10){
+                //اعادة الاستعارة
+                $amount = abs($amount) * -1;
+            }
+
+            $shovarheyov = null;
+            if(is_numeric($request->shovarheyov) and $request->shovarheyov>0){
+                $shovarheyov = $request->shovarheyov;
+            }
+
             $rowUsbincome->id_incom = $request->id_incom;
             $rowUsbincome->id_proj = $id_proj;
-            $rowUsbincome->amount = $request->amount;
+            $rowUsbincome->amount = $amount;
             $rowUsbincome->id_curn = $request->id_curn;
             $rowUsbincome->id_titletwo = $request->id_titletwo;
             $rowUsbincome->nameclient = $request->nameclient;
@@ -794,12 +889,8 @@ class UsbIncomeController extends Controller
             $rowUsbincome->phone = $request->phone;
             $rowUsbincome->nameovid = $request->nameovid;
             $rowUsbincome->note = $request->note;
-
-            $son = null;
-            if (isset($request->son)) {
-                $son = '1';
-            }
             $rowUsbincome->son = $son;
+            $rowUsbincome->kabala_zekou_heyov = $shovarheyov;
 
             $resultCheck = $this->checkBeforeSave($rowUsbincome);
             if(!$resultCheck['status']){

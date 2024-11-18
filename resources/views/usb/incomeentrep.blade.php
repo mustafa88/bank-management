@@ -62,8 +62,12 @@
                     </div>
                     <div class="col-auto">
                         <label for="id_incom">نوع التبرع <span style="color: #ff0000;font-weight: bold;">*</span></label>
-                        <select name="id_incom" id="id_incom" class="custom-select custom-select-sm">
-                        </select>
+                        <select name="id_incom" id="id_incom" class="custom-select custom-select-sm"></select>
+
+                    </div>
+                    <div class="col-auto cls-shovar-heyov">
+                        <label for="shovarheyov">رقم وصل الاستعاره <span style="color: #ff0000;font-weight: bold;">*</span></label>
+                        <input class="form-control mb-2" name='shovarheyov' id="shovarheyov" type="number">
                     </div>
 
                     <div class="col-auto">

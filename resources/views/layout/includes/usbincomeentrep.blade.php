@@ -14,6 +14,33 @@
             }
     }
 
+    $notee = [];
+    if($rowData['note']!=null){
+        $notee[] = $rowData['note'];
+    }
+    //$notee[] = "وصل الاستعاره ";
+
+    if($rowData['kabala_zekou_heyov']!=null){
+         switch ($rowData['id_incom']){
+             case "9":
+                 $notee[] = "وصل ارجاع الاستعاره " . $rowData['kabala_zekou_heyov'];
+                 break;
+            case "10":
+                $notee[] = "وصل الاستعاره " . $rowData['kabala_zekou_heyov'];
+                 break;
+
+            default:
+
+         }
+    }
+    if($rowData['export_at']!=null){
+        $notee[] = "تصدير:" . Str::substr($rowData['export_at'],0,10);
+    }
+    $noteTxt=count($notee);
+    if(count($notee)>0){
+        $noteTxt = implode("<br>",$notee);
+    }
+
 @endphp
 
 <tr>
@@ -23,7 +50,7 @@
     <td>{{$rowData['kabala']}}</td>
     <td>{{$rowData['kabladat']}}</td>
     <td>{{$rowData['nameclient']}}</td>
-    <td>{{$rowData['currency']['symbol']}}{{$rowData['amount']}}</td>
+    <td>{{$rowData['amount']}}&nbsp;{{$rowData['currency']['symbol']}}</td>
     <td>{{$rowData['income']['name']}}</td>
     <td>{{$rowData['titletwo']['ttwo_text']}}</td>
     <td>{{$rowData['phone']}}</td>
@@ -33,13 +60,9 @@
             لا
         @endif</td>
     <td>{{$rowData['nameovid']}}</td>
-    <td>{{$rowData['note']}}
-        @if($rowData['export_at']!=null and $rowData['note']!=null)
-            <br>
-        @endif
-        @if($rowData['export_at']!=null)
-            تصدير: {{Str::substr($rowData['export_at'],0,10)}}
-        @endif
+    <td>{{$noteTxt}}
+
+
     </td>
 
     <td>
