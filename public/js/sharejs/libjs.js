@@ -83,7 +83,7 @@ function SendToAjax(url ,type ,formName ,dataObj){
         //cache: false,
         async: false,
         success: function (data) {
-            //console.log(data);
+            console.log(data);
             resultAjax = data;
             //alert(data.status);
         },

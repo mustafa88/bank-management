@@ -130,6 +130,8 @@ class UsbIncomeController extends Controller
             $a_title .= "زكاة => ";
         }
 
+        //$primekbla = DB::table('Usbincome')->where('kabala', '=', 1222)->sum('amount');
+        //ddd($primekbla);
         $a_title .= Enterprise::find($id_entrep)->name . " => ";
         if($id_proj!= -1){
             $a_title .= Projects::find($id_proj)->name . " => ";
@@ -572,6 +574,82 @@ class UsbIncomeController extends Controller
         if(!isset($arrDate['uuid_usb'])){
             $arrDate['uuid_usb'] ='0';
         }
+
+        if($arrDate['id_incom']=='10'){
+
+            if($arrDate['kabala_zekou_heyov']==null){
+                $resultArr['status'] = false;
+                $resultArr['cls'] = 'error';
+                $resultArr['msg'] = 'جيب ادخال رقم وصل الرهنية';
+                return $resultArr;
+            }
+
+            $rowCheck = Usbincome::where('kabala', $arrDate['kabala_zekou_heyov'])
+                ->where('id_incom', '9')
+                ->where('id_curn', $arrDate['id_curn'])
+                ->get();
+
+            if ($rowCheck->isNotEmpty()) {
+
+                if($rowCheck[0]['id_incom']!='9'){
+                    $resultArr['status'] = false;
+                    $resultArr['cls'] = 'error';
+                    $resultArr['msg'] = 'يجب ان يكون رقم وصل الرهنية من نوع رهنية' ;
+                    return $resultArr;
+                }
+
+                if($rowCheck[0]['amount'] < abs($arrDate['amount'])  ){
+                    $resultArr['status'] = false;
+                    $resultArr['cls'] = 'error';
+                    $resultArr['msg'] = 'مبلغ الارجاع اكبر من مبلغ الرهنية';
+                    return $resultArr;
+                }
+
+                if($rowCheck[0]['id_curn'] != $arrDate['id_curn'] ){
+                    $resultArr['status'] = false;
+                    $resultArr['cls'] = 'error';
+                    $resultArr['msg'] = 'عملة الرهنية مختلفة عن عملة الارجاع';
+                    return $resultArr;
+                }
+
+            }else{
+                $resultArr['status'] = false;
+                $resultArr['cls'] = 'error';
+                $resultArr['msg'] = 'وصل غير موجود';
+                return $resultArr;
+            }
+
+            /**
+             * בדיקה סכום כל השורות שיש להן
+             * kabala_zekou_heyov = shovarheyov
+             * שלא יהיה גדול מ סכום השורהה שהקבלה שווה ל shovarheyov
+             * |unique:usbincome,kabala_zekou_heyov
+             */
+            //مبلغ بوصل الرهنية الاول
+            $primekbla = DB::table('Usbincome')
+                ->where('kabala',  $arrDate['kabala_zekou_heyov'])
+                ->where('id_incom', '9')
+                ->where('id_curn', $arrDate['id_curn'])
+                ->sum('amount');
+
+            $sum_kabala_zekou_heyov = DB::table('Usbincome')
+                ->where('kabala_zekou_heyov',  $arrDate['kabala_zekou_heyov'])
+                ->where('kabala', "!=", $arrDate['kabala'])
+                ->sum('amount');
+
+            if((abs($sum_kabala_zekou_heyov)+abs($arrDate['amount']))>$primekbla){
+                $resultArr['status'] = false;
+                $resultArr['cls'] = 'error';
+                $resultArr['clsa1'] = $primekbla;
+                $resultArr['clsa2'] = $sum_kabala_zekou_heyov;
+                $resultArr['clsa3'] = $arrDate['kabala_zekou_heyov']   ;
+                $resultArr['msg'] = "مجموع مبلغ اعاده الرهنية اكبر من الرهنية  -  يمكن استعاده مبلغ " . ($primekbla - abs($sum_kabala_zekou_heyov));
+                return  $resultArr;
+            }
+        }
+
+
+
         if($arrDate['id_enter']=='1' and $arrDate['id_proj']=='2'){
             //عطاء المريض - جمعية بحد ذاتها
             $rowCheckOther_CityProj = Usbincome::where('id_enter',$arrDate['id_enter'] )
@@ -657,8 +735,19 @@ class UsbIncomeController extends Controller
      */
     public function storeAjax(UsbIncomeRequest $request, $id_entrep, $id_proj, $id_city)
     {
+
         try {
             \DB::beginTransaction(); // Tell Laravel all the code beneath this is a transaction
+
+            /*
+            $request->validate([
+                //'shovarheyov' => 'required',
+                'shovarheyov' => 'nullable|required_if:id_incom,10|numeric|exists:Usbincome,kabala|unique:usbincome,kabala_zekou_heyov'
+            ]);*/
+
+
+            $resultArr = array();
+
 
             if ($request->id_line != 0) {
                 $resultArr['status'] = false;
@@ -666,6 +755,32 @@ class UsbIncomeController extends Controller
                 $resultArr['msg'] = 'תקלה בשמירה';
                 return response()->json($resultArr);
             }
+            /**
+            if($request->id_incom=='10'){
+
+                 * בדיקה סכום כל השורות שיש להן
+                 * kabala_zekou_heyov = shovarheyov
+                 * שלא יהיה גדול מ סכום השורהה שהקבלה שווה ל shovarheyov
+                 * |unique:usbincome,kabala_zekou_heyov
+
+                //مبلغ بوصل الرهنية الاول
+                $primekbla = DB::table('Usbincome')->where('kabala', '=', $request->shovarheyov)->sum('amount');
+
+                $sum_kabala_zekou_heyov = DB::table('Usbincome')
+                    ->where('kabala_zekou_heyov',  $request->shovarheyov)
+                    ->sum('amount');
+
+                //'kabala' => $request->kabala,
+                if((abs($sum_kabala_zekou_heyov)+abs($request->amount))>$primekbla){
+                    $resultArr['status'] = false;
+                    $resultArr['cls'] = 'error';
+                    $resultArr['msg'] = "مجموع مبلغ اعاده الرهنية اكبر من الرهنية  -  يمكن استعاده مبلغ " . ($primekbla - abs($sum_kabala_zekou_heyov));
+                    return  $resultArr;
+                }
+            }
+             */
+
+
 
             if (strlen($request->phone) != 0) {
                 if (!is_numeric($request->phone) or strlen($request->phone) != 10) {
@@ -696,56 +811,7 @@ class UsbIncomeController extends Controller
 
             $shovarheyov = null;
             if(is_numeric($request->shovarheyov) and $request->shovarheyov>0){
-
                 $shovarheyov = $request->shovarheyov;
-
-                if($request->id_incom!='10'){
-                    $resultArr['status'] = false;
-                    $resultArr['cls'] = 'error';
-                    $resultArr['msg'] = 'يجب ان يكون نوع التبرع ارجاع الاستعاره';
-                    return $resultArr;
-                }
-
-                $rowCheck = Usbincome::where('kabala',$shovarheyov)->get();;
-
-                if ($rowCheck->isNotEmpty()) {
-
-                    if($rowCheck[0]['id_incom']!='9'){
-                        $resultArr['status'] = false;
-                        $resultArr['cls'] = 'error';
-                        $resultArr['msg'] = 'يجب ان يكون رقم وصل الاستعاره من نوع استعارة' . $shovarheyov;
-                        return $resultArr;
-                    }
-
-                    if($rowCheck[0]['amount'] < abs($amount)  ){
-                        $resultArr['status'] = false;
-                        $resultArr['cls'] = 'error';
-                        $resultArr['msg'] = 'مبلغ الارجاع اكبر من مبلغ الاستعاره';
-                        return $resultArr;
-                    }
-                    if(  $rowCheck[0]['id_curn'] != $request->id_curn ){
-                        $resultArr['status'] = false;
-                        $resultArr['cls'] = 'error';
-                        $resultArr['msg'] = 'عملة الاستعاره مختلفة عن عملة الارجاع';
-                        return $resultArr;
-                    }
-
-                }else{
-                    $resultArr['status'] = false;
-                    $resultArr['cls'] = 'error';
-                    $resultArr['msg'] = 'وصل غير موجود';
-                    return $resultArr;
-                }
-
-                //לעדכן שובר הזיכוי בקבלת החיוב
-                $rowUsbincomeUpdt = Usbincome::where('id_enter', $id_entrep)
-                        ->where('id_city', $id_city)
-                        ->find($rowCheck[0]['uuid_usb']);
-
-                $rowUsbincomeUpdt->kabala_zekou_heyov = $request->kabala;
-                $rowUsbincomeUpdt->save();
-
-
             }
 
             $dateincome = date('Y-m-d');
@@ -801,7 +867,7 @@ class UsbIncomeController extends Controller
 
             $resultArr['status'] = false;
             $resultArr['cls'] = 'error';
-            $resultArr['msg'] = 'حصل خطا اثناء الحفظ';
+            $resultArr['msg'] = "حصل خطا اثناء الحفظ \n " . $exp->getMessage();
             $resultArr['errormsg'] = $exp->getMessage();
             return $resultArr;
 
@@ -844,14 +910,15 @@ class UsbIncomeController extends Controller
                 }
             }
 
-
-
+            /**
             if($rowUsbincome->kabala_zekou_heyov != null ){
                 $resultArr['status'] = false;
                 $resultArr['cls'] = 'error';
                 $resultArr['msg'] = 'يوجد وصل ارجاع لا يمكن التعديل';
                 return $resultArr;
             }
+            **/
+
 
             if($rowUsbincome->export_at != null ){
                 $resultArr['status'] = false;
@@ -859,8 +926,6 @@ class UsbIncomeController extends Controller
                 $resultArr['msg'] = 'لقد تم ارسال هذه السطر - لا يمكن التعديل عليه';
                 return $resultArr;
             }
-
-
 
             $son = null;
             if (isset($request->son)) {
@@ -919,6 +984,7 @@ class UsbIncomeController extends Controller
 
             $resultArr['status'] = false;
             $resultArr['cls'] = 'error';
+            $resultArr['clso'] = $request->amount;
             $resultArr['msg'] = 'حصل خطا اثناء الحفظ';
             $resultArr['errormsg'] = $exp->getMessage();
             return $resultArr;

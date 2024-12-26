@@ -66,7 +66,7 @@
 
                     </div>
                     <div class="col-auto cls-shovar-heyov">
-                        <label for="shovarheyov">رقم وصل الاستعاره <span style="color: #ff0000;font-weight: bold;">*</span></label>
+                        <label for="shovarheyov">رقم وصل الرهنية <span style="color: #ff0000;font-weight: bold;">*</span></label>
                         <input class="form-control mb-2" name='shovarheyov' id="shovarheyov" type="number">
                     </div>
 

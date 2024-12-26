@@ -18,15 +18,15 @@
     if($rowData['note']!=null){
         $notee[] = $rowData['note'];
     }
-    //$notee[] = "وصل الاستعاره ";
+    //$notee[] = "وصل الهرنية ";
 
     if($rowData['kabala_zekou_heyov']!=null){
          switch ($rowData['id_incom']){
              case "9":
-                 $notee[] = "وصل ارجاع الاستعاره " . $rowData['kabala_zekou_heyov'];
+                 $notee[] = "وصل ارجاع الرهنية " . $rowData['kabala_zekou_heyov'];
                  break;
             case "10":
-                $notee[] = "وصل الاستعاره " . $rowData['kabala_zekou_heyov'];
+                $notee[] = "وصل الرهنية " . $rowData['kabala_zekou_heyov'];
                  break;
 
             default:

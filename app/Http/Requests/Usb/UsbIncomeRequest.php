@@ -58,7 +58,7 @@ class UsbIncomeRequest extends FormRequest
                     'kabladat' => 'required|date_format:Y-m-d',
                     //'phone' => 'numeric',
                     'nameovid' => 'required',
-                    'shovarheyov' => 'numeric|min:1|exists:Usbincome,kabala|unique:usbincome,kabala_zekou_heyov'
+                    'shovarheyov' => 'nullable|required_if:id_incom,10|numeric|exists:Usbincome,kabala'
                 ];
                 //$arrRules = [];
                 break;
