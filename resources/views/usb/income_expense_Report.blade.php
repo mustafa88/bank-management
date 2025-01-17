@@ -31,7 +31,7 @@
                         <select name="enterprise" id="enterprise" class="custom-select custom-select-sm">
                             <option value="-1">اختر</option>
                             @foreach($enterprise_arr as $item)
-                                <option value="{{$item['id']}}" @if($id_entrep==$item['id']) selected @endif>{{$item['name']}} </option>
+                                <option value="{{$item['id']}}" @if(request()->get('enterprise') ==$item['id']) selected @endif>{{$item['name']}} </option>
                             @endforeach
                         </select>
                     </div>

@@ -229,7 +229,7 @@ class UsbIncomeController extends Controller
         //ברירת מחדל 3 = כל התקופות
         $selzaka = $request->input('selzaka', '3');
 
-        if($chekZka &&  $request->session()->get('showLineFromDate') <$lastDayDate){
+        if($chekZka &&  $request->session()->get('showLineFromDate') < $lastDayDate){
             //משתממש ZKA לא יכול לחזור בתאריכים יותר מיום אחד
             $request->session()->put('showLineFromDate', date('Y-m-d'));
         }
@@ -237,6 +237,10 @@ class UsbIncomeController extends Controller
 
         $showLineFromDate = $request->session()->get('showLineFromDate');
         $showLineToDate = $request->session()->get('showLineToDate');
+
+        if($id_entrep==null){
+            $id_entrep = $request->input('id_entrep', '1');
+        }
 
 
 
@@ -246,6 +250,7 @@ class UsbIncomeController extends Controller
         }
 
         $enterprise_arr =  Enterprise::get();
+        //ddd($enterprise_arr);
 
         $allCity = Usbincome::select('Usbincome.id_city', 'city.city_name')
             ->distinct()
@@ -255,15 +260,14 @@ class UsbIncomeController extends Controller
             ->where('id_enter', $id_entrep);
         switch ($selzaka){
             case "1":
-                $allCity = $allCity->whereNull('zaka');
+                //$allCity = $allCity->whereNull('zaka');
                 break;
             case "2":
-                $allCity = $allCity->whereNotNull('zaka');
+                //$allCity = $allCity->whereNotNull('zaka');
                 break;
         }
-
         $allCity =$allCity->get();
-        //return $allCity;
+        //return $id_entrep;
 
         $income_title_curr = [];
         foreach ($allCity as $item_city){
@@ -281,17 +285,17 @@ class UsbIncomeController extends Controller
 
             switch ($selzaka){
                 case "1":
-                    $result = $result->whereNull('zaka');
+                    //$result = $result->whereNull('zaka');
                     break;
                 case "2":
-                    $result = $result->whereNotNull('zaka');
+                    //$result = $result->whereNotNull('zaka');
                     break;
             }
             $result =$result->get();
 
             $income_title_curr[$item_city['id_city']] = $result;
         }
-
+        //return $income_title_curr;
 
         $income_typeincom_curr = [];
         foreach ($allCity as $item_city){
