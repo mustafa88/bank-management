@@ -542,7 +542,7 @@ class ExportImportController extends Controller
                     continue;
                 }
 
-                $listCurrency[$item[7]] =+ $item[6];
+                $listCurrency[$item[7]] = $listCurrency[$item[7]] + $item[6];
 
                 //INSERT
                 Usbincome::create([
