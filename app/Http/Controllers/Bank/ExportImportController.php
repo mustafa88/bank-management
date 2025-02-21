@@ -409,7 +409,7 @@ class ExportImportController extends Controller
 
                 $usbincome_check = Usbincome::withTrashed()->find($uuid_income);
 
-                $listCurrency[$item[7]] =+ $item[6];
+                $listCurrency[$item[7]] += $item[6];
 
                 if ($usbincome_check) {
                     $updated_at_db = $usbincome_check['updated_at']->format('Y-m-d H:i:s');
@@ -542,7 +542,7 @@ class ExportImportController extends Controller
                     continue;
                 }
 
-                $listCurrency[$item[7]] = $listCurrency[$item[7]] + $item[6];
+                $listCurrency[$item[7]] += $item[6];
 
                 //INSERT
                 Usbincome::create([
