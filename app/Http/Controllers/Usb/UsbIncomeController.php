@@ -239,7 +239,13 @@ class UsbIncomeController extends Controller
         $showLineToDate = $request->session()->get('showLineToDate');
 
         if($id_entrep==null){
-            $id_entrep = $request->input('id_entrep', '1');
+            $id_entrep = $request->input('enterprise', '1');
+        }
+
+        if(request()->has('enterprise') and request()->filled('enterprise')){
+            // الحقل موجود، وليس فارغ
+            $id_entrep = $request->input('enterprise');
+
         }
 
 
