@@ -155,6 +155,9 @@
                     <table class="table">
                         <thead>
                         <tr>
+                            <th>جمعية</th>
+                            <th>مشروع</th>
+                            <th>بلد</th>
                             <th>تاريخ الوصل</th>
                             <th>اسم متبرع</th>
                             <th>مبلغ</th>

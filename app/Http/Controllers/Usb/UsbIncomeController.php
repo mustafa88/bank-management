@@ -498,8 +498,8 @@ class UsbIncomeController extends Controller
 
         $rowCheck = Usbincome::with(['enterprise', 'projects', 'city', 'income', 'currency', 'titletwo'])
             ->where('id_enter',$id_entrep )
-            ->where('id_proj',$id_proj )
-            ->where('id_city',$id_city)
+            //->where('id_proj',$id_proj )
+            //->where('id_city',$id_city)
             ->where('kabala',$request->kabala )
             //->where('uuid_usb',"!=",$request->id_line)
             ->get();
@@ -694,8 +694,9 @@ class UsbIncomeController extends Controller
             $rowCheckOther_CityProj = Usbincome::where('id_enter',$arrDate['id_enter'] )
                 ->where('kabala',$arrDate['kabala'] )
                 ->where(function ($query) use ($arrDate) {
-                    $query->where('id_proj',"!=",$arrDate['id_proj'])
-                    ->orwhere('id_city',"!=",$arrDate['id_city']);
+                    $query
+                        ->where('id_city',"!=",$arrDate['id_city']);
+                        //->orwhere('id_proj',"!=",$arrDate['id_proj'])
                 })
                 ->where('uuid_usb',"!=",$arrDate['uuid_usb'])
                 ->get();

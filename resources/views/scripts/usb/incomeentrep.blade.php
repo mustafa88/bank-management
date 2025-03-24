@@ -104,7 +104,7 @@
             //console.log(row)
             $("#listkabala").show();
             for(let i=0;i<row.length;i++){
-                $('#listkabalabody').append(`<tr><td>${row[i]['dateincome']}</td><td>${row[i]['nameclient']}</td><td>${row[i]['amount']}${row[i]['currency']['symbol']}</td><td>${row[i]['income']['name']}</td><td>${row[i]['titletwo']['ttwo_text']}</td></tr>`);
+                $('#listkabalabody').append(`<tr><td>${row[i]['enterprise']['name']}</td><td>${row[i]['projects']['name']}</td><td>${row[i]['city']['city_name']}</td><td>${row[i]['dateincome']}</td><td>${row[i]['nameclient']}</td><td>${row[i]['amount']}${row[i]['currency']['symbol']}</td><td>${row[i]['income']['name']}</td><td>${row[i]['titletwo']['ttwo_text']}</td></tr>`);
             }
 
         });
