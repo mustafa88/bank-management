@@ -407,7 +407,33 @@ class AdahiController extends Controller
 
         $totalReportArr= $methodBuy = $ReportThll=$ReportPartAdhi=[];
 
-        //////
+
+        //מרוכז עבור כולם ביחד
+        $result = Adahi::select
+        (
+            DB::raw("round(sum(Adahi.sheep),0) as countsheep"),
+            DB::raw("mod(round(sum(Adahi.cowseven),0),7) as  countcowseven"),
+            DB::raw("round(sum(Adahi.cow),0) + FLOOR(round(sum(Adahi.cowseven),0) / 7) as countcow"),
+            DB::raw("round(sum(Adahi.sheepprice),0) as sumsheepprice"),
+            DB::raw("round(sum(Adahi.cowsevenprice),0) + round(sum(Adahi.cowprice),0) as sumcow"),
+            DB::raw("round(sum(Adahi.expens),0) as sumexpens"),
+
+            DB::raw("round(sum(Adahi.sheepprice),0) +
+                               round(sum(Adahi.cowsevenprice),0) +
+                               round(sum(Adahi.cowprice),0) +
+                               round(sum(Adahi.expens),0)
+                                as sumtotalall"),
+
+        )
+            ->leftJoin('city', 'city.city_id', '=', 'Adahi.id_city')
+            ->where('datewrite', '>=', $showLineFromDate)
+            ->where('datewrite', '<=', $showLineToDate)
+            //->where('id_city', $item_city['id_city'])
+            ->get();
+
+        $totalReportAllCity= $result;
+
+        //////מרוכז לפי עיר
         $result = Adahi::select
         ('city.city_name',
             DB::raw("round(sum(Adahi.sheep),0) as countsheep"),
@@ -436,6 +462,27 @@ class AdahiController extends Controller
 
         ///////
         $result = Adahi::select
+        ('title_two.ttwo_text',
+            DB::raw("round(sum(Adahi.sheepprice),0) +
+                               round(sum(Adahi.cowsevenprice),0) +
+                               round(sum(Adahi.cowprice),0) +
+                               round(sum(Adahi.expens),0)
+                                as sumtotalall"),
+
+        )
+            ->leftJoin('title_two', 'title_two.ttwo_id', '=', 'Adahi.id_titletwo')
+            ->where('datewrite', '>=', $showLineFromDate)
+            ->where('datewrite', '<=', $showLineToDate)
+            //->where('id_city', $item_city['id_city'])
+            ->groupBy('title_two.ttwo_text')
+            ->orderBy('ttwo_text', 'asc')
+            ->get();
+
+        $methodBuyAllCity= $result;
+
+
+        ///////
+        $result = Adahi::select
         ('city.city_name','title_two.ttwo_text',
 
             DB::raw("round(sum(Adahi.sheepprice),0) +
@@ -456,6 +503,9 @@ class AdahiController extends Controller
             ->get();
 
         $methodBuy= $result;
+
+
+
         //return $methodBuy;
         ///////
         $result = Adahi::with('city')
@@ -486,9 +536,8 @@ class AdahiController extends Controller
             ->orderBy('id_city', 'asc')
             ->get();
 
-
         return view('usb.adahi_Report',
-            compact('totalReportArr','methodBuy'
+            compact('totalReportAllCity','totalReportArr','methodBuy','methodBuyAllCity'
                 ,'ReportThll','ReportPartAdhi','ReportAllTableAdahi')
         )->with(
             [
