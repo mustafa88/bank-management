@@ -35,7 +35,7 @@ Route::middleware(['auth', 'role:user'])
 
  */
 
-define("LAMB_PRICE",3100);
+define("LAMB_PRICE",3000);
 define("COWSEVEN_PRICE",1500);
 define("COW_PRICE",11500);
 
