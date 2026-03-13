@@ -266,10 +266,10 @@ class UsbIncomeController extends Controller
             ->where('id_enter', $id_entrep);
         switch ($selzaka){
             case "1":
-                //$allCity = $allCity->whereNull('zaka');
+                $allCity = $allCity->whereNull('zaka');
                 break;
             case "2":
-                //$allCity = $allCity->whereNotNull('zaka');
+                $allCity = $allCity->whereNotNull('zaka');
                 break;
         }
         $allCity =$allCity->get();
@@ -291,10 +291,10 @@ class UsbIncomeController extends Controller
 
             switch ($selzaka){
                 case "1":
-                    //$result = $result->whereNull('zaka');
+                    $result = $result->whereNull('zaka');
                     break;
                 case "2":
-                    //$result = $result->whereNotNull('zaka');
+                    $result = $result->whereNotNull('zaka');
                     break;
             }
             $result =$result->get();
