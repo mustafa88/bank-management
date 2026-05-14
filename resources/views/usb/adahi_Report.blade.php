@@ -50,7 +50,7 @@
 
             <div class="row">
 
-                <div class="col-6">
+                <div class="col-10">
                     <div class="card card-default">
                         <div class="card-header">تلخيص مجموع مشروع الاضاحي لجميع البلدان</div>
                         <div class="card-body">
@@ -91,7 +91,7 @@
 
             <div class="row">
 
-                <div class="col-6">
+                <div class="col-10">
                     <div class="card card-default">
                         <div class="card-header">تلخيص مجموع مشروع الاضاحي - لكل بلد</div>
                         <div class="card-body">

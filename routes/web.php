@@ -35,9 +35,9 @@ Route::middleware(['auth', 'role:user'])
 
  */
 
-define("LAMB_PRICE",3000);
-define("COWSEVEN_PRICE",1500);
-define("COW_PRICE",10500);
+define("LAMB_PRICE",2400);
+define("COWSEVEN_PRICE",1600);
+define("COW_PRICE",11250);
 
 Route::get('/', function () {
     return view('welcome');
